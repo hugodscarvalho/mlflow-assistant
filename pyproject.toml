@@ -1,0 +1,22 @@
+[project]
+name = "mlflow-assistant"
+version = "0.1.0"
+description = "An MLflow plugin that enables natural language conversations with your MLflow server using LLM providers like OpenAI and Ollama."
+authors = [
+    {name = "Hugo Carvalho",email = "hugodanielsilvacarvalho.hc@gmail.com"}
+]
+license = {text = "Apache License 2.0"}
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.11.6"
+pre-commit = "^4.2.0"
+
