@@ -1,0 +1,48 @@
+name: Run Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mlflow:
+        image: ghcr.io/mlflow/mlflow
+        ports:
+          - 5000:5000
+        options: >-
+          --health-cmd "curl --fail http://localhost:5000/health || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: |
+          poetry install
+
+      - name: Run unit tests
+        run: |
+          poetry run pytest -m "not integration" tests
+
+      - name: Log MLFLOW_TRACKING_URI
+        run: echo "MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI"
+
+      - name: Run integration tests
+        env:
+          MLFLOW_TRACKING_URI: http://localhost:5000
+        run: |
+          poetry run pytest -m integration tests
