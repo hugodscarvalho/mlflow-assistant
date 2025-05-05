@@ -24,15 +24,20 @@ jobs:
 
       - name: Start MLflow server
         run: |
-          nohup mlflow server --host 0.0.0.0 --port 5000 &
+          nohup poetry run mlflow server --host 0.0.0.0 --port 5000 &
 
       - name: Wait for MLflow server to be ready
         run: |
-          until curl -s http://localhost:5000; do
+          for i in {1..12}; do  # Retry up to 12 times (60 seconds total)
+            if curl -s http://localhost:5000; then
+              echo "MLflow server is ready!"
+              exit 0
+            fi
             echo "Waiting for MLflow server to be ready..."
             sleep 5
           done
-          echo "MLflow server is ready!"
+          echo "MLflow server failed to start within the timeout period."
+          exit 1
 
       - name: Run unit tests
         run: |
