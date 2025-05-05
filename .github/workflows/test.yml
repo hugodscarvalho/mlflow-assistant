@@ -1,3 +1,7 @@
+name: Run Tests
+
+on: [push, pull_request]
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -18,31 +22,27 @@ jobs:
       - name: Install dependencies
         run: poetry install
 
-      - name: Start MLflow tracking server
-        env:
-          BACKEND_STORE_URI: sqlite:///mlflow.db
-          ARTIFACT_ROOT: ./mlruns
+      - name: Start MLflow server
         run: |
-          mkdir -p ./mlruns
-          poetry run mlflow server \
-            --backend-store-uri=$BACKEND_STORE_URI \
-            --default-artifact-root=$ARTIFACT_ROOT \
-            --host localhost --port 5000 &
+          nohup mlflow server --host 0.0.0.0 --port 5000 &
 
-          # Wait for MLflow to become available
-          for i in {1..10}; do
-            if curl --fail http://localhost:5000; then
-              echo "MLflow is up!"
-              break
-            fi
-            echo "Waiting for MLflow..."
-            sleep 3
+      - name: Wait for MLflow server to be ready
+        run: |
+          until curl -s http://localhost:5000; do
+            echo "Waiting for MLflow server to be ready..."
+            sleep 5
           done
+          echo "MLflow server is ready!"
 
       - name: Run unit tests
-        run: poetry run pytest -m "not integration" tests
+        run: |
+          poetry run pytest -m "not integration" tests
+
+      - name: Log MLFLOW_TRACKING_URI
+        run: echo "MLFLOW_TRACKING_URI=http://localhost:5000"
 
       - name: Run integration tests
         env:
           MLFLOW_TRACKING_URI: http://localhost:5000
-        run: poetry run pytest -m integration tests
+        run: |
+          poetry run pytest -m integration tests
