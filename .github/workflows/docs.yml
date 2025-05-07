@@ -1,10 +1,13 @@
 name: Deploy Documentation to GitHub Pages
 
-on: [push, pull_request]
+on:
+  push:
+    tags:
+      - 'v*'  # triggers on version tags like v0.1.0
 
 permissions:
   contents: write
-  
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
