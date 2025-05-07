@@ -1,5 +1,6 @@
 from mlflow.tracking import MlflowClient
 
+
 def get_mlflow_client():
     """
     Initializes and returns an MLflow client instance.
