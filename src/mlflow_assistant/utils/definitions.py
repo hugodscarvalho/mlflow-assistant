@@ -1,6 +1,4 @@
-"""
-Constants and definitions for the MLflow Assistant.
-"""
+"""Constants and definitions for the MLflow Assistant."""
 from dataclasses import dataclass
 
 
@@ -18,8 +16,9 @@ REMOTE_CONNECTION = "remote"
 @dataclass
 class MLflowConnectionConfig:
     """Configuration for MLflow connection."""
+
     tracking_uri: str
-    
+
     @property
     def connection_type(self) -> str:
         """Return the connection type (local or remote)."""

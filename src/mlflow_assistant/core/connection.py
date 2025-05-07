@@ -1,5 +1,4 @@
-"""
-MLflow connection module for handling connections to MLflow Tracking Server.
+"""MLflow connection module for handling connections to MLflow Tracking Server.
 
 This module provides functionality to connect to both local and remote MLflow Tracking Servers
 using environment variables or direct configuration.
@@ -7,7 +6,7 @@ using environment variables or direct configuration.
 
 import os
 import logging
-from typing import Dict, Any, Optional, Tuple
+from typing import Any
 
 import mlflow
 from mlflow.tracking import MlflowClient
@@ -23,45 +22,48 @@ logger = logging.getLogger(__name__)
 
 
 class MLflowConnection:
-    """
-    MLflow connection class to handle connections to MLflow Tracking Server.
-    
+    """MLflow connection class to handle connections to MLflow Tracking Server.
+
     This class provides functionality to connect to both local and remote
     MLflow Tracking Servers.
     """
 
-    def __init__(self, tracking_uri: Optional[str] = None, client_factory=None):
-        """
-        Initialize MLflow connection.
+    def __init__(self, tracking_uri: str | None = None, client_factory=None):
+        """Initialize MLflow connection.
 
         Args:
+        ----
             tracking_uri: URI of the MLflow Tracking Server. If None, will try to get from environment.
             client_factory: A callable to create the MlflowClient instance. Defaults to MlflowClient.
+
         """
         self.config = self._load_config(tracking_uri=tracking_uri)
         self.client = None
         self.is_connected_flag = False
         self.client_factory = client_factory or MlflowClient
 
-    def _load_config(self, tracking_uri: Optional[str] = None) -> MLflowConnectionConfig:
-        """
-        Load configuration from environment variables or explicit parameters.
+    def _load_config(self, tracking_uri: str | None = None) -> MLflowConnectionConfig:
+        """Load configuration from environment variables or explicit parameters.
 
         Args:
+        ----
             tracking_uri: URI of the MLflow Tracking Server. If None, will try to get from environment.
 
         Returns:
+        -------
             MLflowConnectionConfig: Configuration for MLflow connection.
+
         """
         tracking_uri = tracking_uri or os.environ.get(MLFLOW_TRACKING_URI_ENV, DEFAULT_MLFLOW_TRACKING_URI)
         return MLflowConnectionConfig(tracking_uri=tracking_uri)
 
-    def connect(self) -> Tuple[bool, str]:
-        """
-        Connect to MLflow Tracking Server.
+    def connect(self) -> tuple[bool, str]:
+        """Connect to MLflow Tracking Server.
 
-        Returns:
+        Returns
+        -------
             Tuple[bool, str]: (success, message)
+
         """
         try:
             logger.info(f"Connecting to MLflow Tracking Server at {self.config.tracking_uri}")
@@ -73,38 +75,43 @@ class MLflowConnection:
             return True, f"Successfully connected to MLflow Tracking Server at {self.config.tracking_uri}"
         except Exception as e:
             self.is_connected_flag = False
-            logger.error(f"Failed to connect to MLflow Tracking Server: {e}")
-            return False, f"Failed to connect to MLflow Tracking Server: {str(e)}"
+            logger.exception(f"Failed to connect to MLflow Tracking Server: {e}")
+            return False, f"Failed to connect to MLflow Tracking Server: {e!s}"
 
     def get_client(self) -> MlflowClient:
-        """
-        Get MLflow client instance.
+        """Get MLflow client instance.
 
-        Returns:
+        Returns
+        -------
             MlflowClient: MLflow client instance.
 
-        Raises:
+        Raises
+        ------
             MLflowConnectionError: If not connected to MLflow Tracking Server.
+
         """
         if self.client is None:
-            raise MLflowConnectionError("Not connected to MLflow Tracking Server. Call connect() first.")
+            msg = "Not connected to MLflow Tracking Server. Call connect() first."
+            raise MLflowConnectionError(msg)
         return self.client
 
     def is_connected(self) -> bool:
-        """
-        Check if connected to MLflow Tracking Server.
+        """Check if connected to MLflow Tracking Server.
 
-        Returns:
+        Returns
+        -------
             bool: True if connected, False otherwise.
+
         """
         return self.is_connected_flag
 
-    def get_connection_info(self) -> Dict[str, Any]:
-        """
-        Get connection information.
+    def get_connection_info(self) -> dict[str, Any]:
+        """Get connection information.
 
-        Returns:
+        Returns
+        -------
             Dict[str, Any]: Connection information.
+
         """
         return {
             "tracking_uri": self.config.tracking_uri,
