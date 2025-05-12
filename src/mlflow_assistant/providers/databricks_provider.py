@@ -4,7 +4,6 @@ import os
 from typing import Optional
 
 from databricks_langchain import ChatDatabricks
-
 from mlflow_assistant.utils.constants import Provider
 
 from .base import AIProvider

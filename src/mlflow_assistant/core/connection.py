@@ -4,7 +4,6 @@ from typing import Any
 
 import mlflow
 from mlflow.tracking import MlflowClient
-
 from mlflow_assistant.utils.definitions import (
     DEFAULT_MLFLOW_TRACKING_URI,
     MLFLOW_TRACKING_URI_ENV,

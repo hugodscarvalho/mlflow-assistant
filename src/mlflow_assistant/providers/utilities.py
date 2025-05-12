@@ -3,7 +3,6 @@ import logging
 import subprocess
 
 import requests
-
 from mlflow_assistant.utils.constants import DEFAULT_OLLAMA_URI
 
 from .definitions import FALLBACK_MODELS

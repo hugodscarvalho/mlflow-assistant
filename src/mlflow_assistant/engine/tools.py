@@ -6,11 +6,11 @@ from datetime import datetime
 
 import mlflow
 from langchain_core.tools import tool
-
 from mlflow_assistant.core.connection import MLflowConnection
+from mlflow_assistant.engine.definitions import MLFLOW_MAX_RESULTS, NA, TIME_FORMAT
 from mlflow_assistant.utils.config import get_mlflow_uri
 
-logger = logging.getLogger("mlflow-assistant.enngine.tools")
+logger = logging.getLogger("mlflow_assistant.enngine.tools")
 
 
 class MLflowTools:
@@ -20,9 +20,9 @@ class MLflowTools:
     def _format_timestamp(timestamp_ms: int) -> str:
         """Convert a millisecond timestamp to a human-readable string."""
         if not timestamp_ms:
-            return "N/A"
+            return NA
         dt = datetime.fromtimestamp(timestamp_ms / 1000.0)
-        return dt.strftime("%Y-%m-%d %H:%M:%S")
+        return dt.strftime(TIME_FORMAT)
 
 
 # Get MLflow client
@@ -32,7 +32,7 @@ client = mlflow_connection.get_client()
 
 
 @tool
-def list_models(name_contains: str = "", max_results: int = 100) -> str:
+def list_models(name_contains: str = "", max_results: int = MLFLOW_MAX_RESULTS) -> str:
     """
     List all registered models in the MLflow model registry, with optional filtering.
 
@@ -107,7 +107,9 @@ def list_models(name_contains: str = "", max_results: int = 100) -> str:
 
 
 @tool
-def list_experiments(name_contains: str = "", max_results: int = 100) -> str:
+def list_experiments(
+    name_contains: str = "", max_results: int = MLFLOW_MAX_RESULTS
+) -> str:
     """
     List all experiments in the MLflow tracking server, with optional filtering.
 

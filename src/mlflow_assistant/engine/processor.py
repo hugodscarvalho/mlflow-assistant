@@ -5,6 +5,11 @@ import logging
 from typing import Any, Dict
 
 from langchain_core.messages import HumanMessage
+from mlflow_assistant.engine.definitions import (
+    STATE_KEY_MESSAGES,
+    STATE_KEY_PROVIDER_CONFIG,
+)
+from mlflow_assistant.utils.constants import CONFIG_KEY_MODEL, CONFIG_KEY_TYPE
 
 logger = logging.getLogger("mlflow_assistant.engine.processor")
 
@@ -36,14 +41,16 @@ async def process_query(
 
         # Run workflow with provider config
         initial_state = {
-            "messages": [HumanMessage(content=query)],
-            "provider_config": provider_config,
+            STATE_KEY_MESSAGES: [HumanMessage(content=query)],
+            STATE_KEY_PROVIDER_CONFIG: provider_config,
         }
 
         if verbose:
             logger.info(f"Running workflow with query: {query}")
-            logger.info(f"Using provider: {provider_config.get('type')}")
-            logger.info(f"Using model: {provider_config.get('model', 'default')}")
+            logger.info(f"Using provider: {provider_config.get(CONFIG_KEY_TYPE)}")
+            logger.info(
+                f"Using model: {provider_config.get(CONFIG_KEY_MODEL, 'default')}"
+            )
 
         result = await workflow.ainvoke(initial_state)
 
@@ -52,7 +59,7 @@ async def process_query(
 
         response = {
             "original_query": query,
-            "response": result.get("messages")[-1],
+            "response": result.get(STATE_KEY_MESSAGES)[-1],
             "duration": duration,  # Add duration to response
         }
 

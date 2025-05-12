@@ -4,14 +4,6 @@ FALLBACK_MODELS = ["llama2", "mistral", "gemma", "phi"]
 
 DATABRICKS_CREDENTIALS = ["DATABRICKS_TOKEN", "DATABRICKS_HOST"]
 
-# Structured output settings
-STRUCTURED_TEMPERATURE = 0.1
-JSON_FORMAT = "json"
-
-# Roles
-SYSTEM_ROLE = "system"
-HUMAN_ROLE = "human"
-
 
 # Provider parameters
 class ParameterKeys:

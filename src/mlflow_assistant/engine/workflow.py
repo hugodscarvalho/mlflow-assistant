@@ -11,6 +11,10 @@ from langchain_core.messages import BaseMessage
 from langgraph.graph import StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
+from mlflow_assistant.engine.definitions import (
+    STATE_KEY_MESSAGES,
+    STATE_KEY_PROVIDER_CONFIG,
+)
 from providers import AIProvider
 from tools import get_model_details, get_system_info, list_experiments, list_models
 from typing_extensions import TypedDict
@@ -38,16 +42,16 @@ def create_workflow():
 
     def call_model(state: State) -> State:
         """Call the AI model and return updated state with response."""
-        messages = state["messages"]
-        provider_config = state.get("provider_config", {})
+        messages = state[STATE_KEY_MESSAGES]
+        provider_config = state.get(STATE_KEY_PROVIDER_CONFIG, {})
         try:
             provider = AIProvider.create(provider_config)
             model = provider.langchain_model().bind_tools(tools)
             response = model.invoke(messages)
-            return {**state, "messages": [response]}
+            return {**state, STATE_KEY_MESSAGES: [response]}
         except Exception as e:
             logger.error(f"Error generating response: {e}", exc_info=True)
-            return {**state, "messages": messages}
+            return {**state, STATE_KEY_MESSAGES: messages}
 
     # Add nodes
     graph_builder.add_node("tools", ToolNode(tools))
