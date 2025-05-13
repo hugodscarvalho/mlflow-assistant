@@ -1,0 +1,20 @@
+/* Custom Colors for MLflow */
+:root > * {
+    --md-primary-fg-color:        #0b96e3;  /* MLflow Blue */
+    --md-primary-fg-color--light: #49cbef;  /* Lighter Blue */
+    --md-primary-fg-color--dark:  #1e75b5;  /* Darker Blue */
+    
+    --md-accent-fg-color:         #19eddb;  /* MLflow Turquoise */
+    --md-accent-fg-color--light:  #5df8f2;  /* Light Turquoise */
+    --md-accent-fg-color--dark:   #14a8a1;  /* Darker Turquoise */
+    
+    --md-secondary-fg-color:      #1e1e1e;  /* Black (Dark Text) */
+    --md-secondary-fg-color--light: #a0a0a0; /* Light Grey */
+    --md-secondary-fg-color--dark: #000000;  /* Pure Black */
+    
+    --md-link-color:             #0b96e3;  /* Standard MLflow Blue (for links) */
+    --md-link-color--hover:      #1e75b5;  /* Darker Blue on hover */
+    
+    --md-background-color:       #ffffff;  /* White Background */
+    --md-background-color--dark: #121212;  /* Dark Background for Dark Mode */
+}
