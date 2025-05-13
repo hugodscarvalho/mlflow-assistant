@@ -1,36 +1,144 @@
-name: Publish to PyPI
+name: Tag & Publish to PyPI
 
 on:
   push:
-    tags:
-      - 'v*'  # triggers on version tags like v0.1.0
+    branches:
+      - main
 
 jobs:
-  publish:
-    name: Build and Publish
+  release-and-publish:
+    name: Release & Publish to PyPI
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Set up Python
+      - name: 🐍 Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'  # or your preferred version
+          python-version: '3.12'
 
-      - name: Install Poetry
+      - name: 📦 Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Install dependencies
+      - name: 📚 Install dependencies
         run: poetry install --no-root
 
-      - name: Build package
+      - name: 🔖 Get current Poetry version
+        id: poetry-version
+        run: |
+          CURRENT_VERSION=$(poetry version -s)
+          echo "::notice::Poetry version: $CURRENT_VERSION"
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: 🔍 Validate version format
+        run: |
+          VERSION="${{ steps.poetry-version.outputs.version }}"
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Invalid version format: $VERSION. Expected semantic versioning (e.g., 1.2.3)."
+            exit 1
+          fi
+
+      - name: 📝 Check if version was bumped in commit
+        id: version-bumped
+        run: |
+          # Get the previous version from the previous commit
+          PREVIOUS_VERSION=$(git show ${GITHUB_SHA}^:pyproject.toml | grep '^version =' | awk -F '= ' '{print $2}' | tr -d '"')
+      
+          # Get the current version using Poetry
+          CURRENT_VERSION="${{ steps.poetry-version.outputs.version }}"
+      
+          # Compare the versions
+          if [ "$PREVIOUS_VERSION" != "$CURRENT_VERSION" ]; then
+            echo "::notice::Version bumped from $PREVIOUS_VERSION to $CURRENT_VERSION."
+            echo "VERSION_BUMPED=true" >> $GITHUB_ENV
+          else
+            echo "::warning::No version bump detected. Skipping deployment."
+            echo "VERSION_BUMPED=false" >> $GITHUB_ENV
+          fi
+        
+
+      - name: 🏷️ Check if tag already exists
+        if: env.VERSION_BUMPED == 'true'
+        id: check-tag
+        run: |
+          git fetch --tags
+          TAG="v${{ steps.poetry-version.outputs.version }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "::warning::Tag $TAG already exists. Skipping deployment."
+            echo "DEPLOY_ELIGIBLE=false" >> $GITHUB_ENV
+          else
+            echo "::notice::Tag $TAG does not exist yet. Proceeding to deploy."
+            echo "DEPLOY_ELIGIBLE=true" >> $GITHUB_ENV
+          fi
+
+      - name: 🛠️ Build package
+        if: env.DEPLOY_ELIGIBLE == 'true'
         run: poetry build
 
-      - name: Publish to PyPI
+      - name: 🚀 Publish to PyPI
+        if: env.DEPLOY_ELIGIBLE == 'true'
+        id: publish
         env:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_API_TOKEN }}
-        run: poetry publish --username __token__ --password $POETRY_PYPI_TOKEN_PYPI
+        run: |
+          if poetry publish --username __token__; then
+            echo "::notice::Package published successfully to PyPI."
+            echo "PUBLISH_SUCCEEDED=true" >> $GITHUB_ENV
+          else
+            echo "::error::Failed to publish package to PyPI."
+            echo "PUBLISH_SUCCEEDED=false" >> $GITHUB_ENV
+          fi
+
+      - name: 🏁 Create and push tag
+        if: env.DEPLOY_ELIGIBLE == 'true' && env.PUBLISH_SUCCEEDED == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${{ steps.poetry-version.outputs.version }}
+          TAG="v$VERSION"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag -a "$TAG" -m "Release version $TAG"
+          if git push origin "$TAG"; then
+            echo "::notice::Git tag $TAG created and pushed."
+            echo "TAG_PUSHED=true" >> $GITHUB_ENV
+          else
+            echo "::warning::Failed to push Git tag $TAG."
+            echo "TAG_PUSHED=false" >> $GITHUB_ENV
+          fi
+
+      - name: 📄 Extract release notes from CHANGELOG.md
+        if: env.TAG_PUSHED == 'true'
+        id: extract-notes
+        run: |
+          VERSION="v${{ steps.poetry-version.outputs.version }}"
+          echo "::notice::Extracting release notes for version $VERSION from CHANGELOG.md."
+          awk -v ver="$VERSION" '
+            $0 ~ "^## \\[" ver "\\]" { in_version=1; next }
+            in_version && $0 ~ /^## \[/ { exit }
+            in_version { print }
+          ' CHANGELOG.md > release_notes.md
+          if [ -s release_notes.md ]; then
+            echo "::notice::Release notes successfully extracted for version $VERSION."
+          else
+            echo "::warning::Could not extract release notes for version $VERSION. Creating a placeholder file."
+            echo "Release notes for version $VERSION could not be extracted. Please check the CHANGELOG.md file manually." > release_notes.md
+          fi
+          echo "CHANGELOG_PARSED=true" >> $GITHUB_ENV        
+  
+      - name: 📦 Create GitHub Release
+        if: env.TAG_PUSHED == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.poetry-version.outputs.version }}
+          body_path: release_notes.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
