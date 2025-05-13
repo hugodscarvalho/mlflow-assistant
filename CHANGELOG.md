@@ -12,3 +12,11 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows c
 ### Notes
 - This version was intentionally published with limited functionality to reserve the `mlflow-assistant` package name on [PyPI](https://pypi.org/project/mlflow-assistant/).
 - Full development will begin in upcoming versions with a focus on making MLflow easier to use through high-level utilities and assistant-like automation features.
+
+## [v0.2.0] – 2025-05-13
+### Added
+- **Setup** This allows users to setup mlflow-assistant.
+- **Start** This allows users to start the session to interact with mlflow interactively.
+
+### Notes
+- Start functionality is currently limited as it is calling a mock function
