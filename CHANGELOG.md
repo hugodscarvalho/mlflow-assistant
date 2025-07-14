@@ -4,6 +4,20 @@ All notable changes to the `mlflow-assistant` package will be documented in this
 
 This project adheres to [Semantic Versioning](https://semver.org/) and follows changelog conventions inspired by [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [v0.1.1] – 2025-07-14
+### Added
+- Introduced a **unified CI/CD pipeline** for:
+  - Linting with `ruff`.
+  - Type checking with `mypy`.
+  - Test execution with `pytest` and coverage reporting via `pytest-cov`.
+  - Publishing to PyPI on new Git tags.
+
+### Changed
+- Improved test fixture logic for integration tests to correctly check for a live MLflow Tracking Server before execution.
+
+### Notes
+- This pipeline simplifies maintenance by consolidating quality checks and publishing into a single workflow, triggered on pushes and releases.
+
 ## [v0.1.0] – 2025-05-08
 ### Added
 - **Initial placeholder release** of `mlflow-assistant` on PyPI.
