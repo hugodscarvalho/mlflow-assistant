@@ -8,7 +8,7 @@ import pytest
 from mlflow_assistant.core.connection import MLflowConnection
 
 
-@pytest.mark.integration()
+@pytest.mark.integration
 def test_connect_to_real_server():
     """Test connection to a real MLflow Tracking Server.
 
