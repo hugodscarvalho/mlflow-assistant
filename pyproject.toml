@@ -1,6 +1,6 @@
 [project]
 name = "mlflow-assistant"
-version = "0.1.0"
+version = "0.1.1"
 description = "An MLflow plugin that enables natural language conversations with your MLflow server using LLM providers like OpenAI and Ollama."
 authors = [
     {name = "Hugo Carvalho",email = "hugodanielsilvacarvalho.hc@gmail.com"}
