@@ -50,7 +50,7 @@ class TestMLflowConnectionConfig:
         config = MLflowConnectionConfig(tracking_uri="http://localhost:5000")
         assert config.connection_type == REMOTE_CONNECTION
 
-        config = MLflowConnectionConfig(tracking_uri="https://mlflow.example.com")
+        config = MLflowConnectionConfig(tracking_uri="http://localhost:5000")
         assert config.connection_type == REMOTE_CONNECTION
 
 
@@ -74,8 +74,8 @@ class TestMLflowConnection:
         This test verifies that the tracking URI is correctly set when
         provided during initialization.
         """
-        conn = MLflowConnection(tracking_uri="http://mlflow.example.com")
-        assert conn.config.tracking_uri == "http://mlflow.example.com"
+        conn = MLflowConnection(tracking_uri="http://localhost:5000")
+        assert conn.config.tracking_uri == "http://localhost:5000"
 
     def test_load_config_from_env(self, monkeypatch):
         """Test loading the tracking URI from environment variables.
@@ -83,9 +83,9 @@ class TestMLflowConnection:
         This test verifies that the tracking URI is correctly loaded
         from the MLFLOW_TRACKING_URI environment variable.
         """
-        monkeypatch.setenv("MLFLOW_TRACKING_URI", "http://env-mlflow.example.com")
+        monkeypatch.setenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
         conn = MLflowConnection()
-        assert conn.config.tracking_uri == "http://env-mlflow.example.com"
+        assert conn.config.tracking_uri == "http://localhost:5000"
 
     @patch("mlflow.set_tracking_uri")
     @patch("mlflow.tracking.MlflowClient")
@@ -122,7 +122,7 @@ class TestMLflowConnection:
         mock_client_instance.search_experiments.return_value = []
 
         conn = MLflowConnection(
-            tracking_uri="http://mlflow.example.com",
+            tracking_uri="http://localhost:5000",
             client_factory=lambda tracking_uri: mock_client_instance,
         )
         success, message = conn.connect()
@@ -130,7 +130,7 @@ class TestMLflowConnection:
         assert success is True
         assert "Successfully connected" in message
         assert conn.is_connected() is True
-        mock_set_tracking_uri.assert_called_once_with("http://mlflow.example.com")
+        mock_set_tracking_uri.assert_called_once_with("http://localhost:5000")
         mock_client_instance.search_experiments.assert_called_once()
 
     @patch("mlflow.set_tracking_uri")
@@ -191,9 +191,9 @@ class TestMLflowConnection:
         returned, including the tracking URI, connection type, and
         connection status.
         """
-        conn = MLflowConnection(tracking_uri="http://mlflow.example.com")
+        conn = MLflowConnection(tracking_uri="http://localhost:5000")
         info = conn.get_connection_info()
-        assert info["tracking_uri"] == "http://mlflow.example.com"
+        assert info["tracking_uri"] == "http://localhost:5000"
         assert info["connection_type"] == REMOTE_CONNECTION
         assert info["is_connected"] is False
 
