@@ -81,6 +81,8 @@ jobs:
     if: github.ref == 'refs/heads/main'
     permissions:
       contents: write
+      pages: write
+      id-token: write
 
     steps:
       - name: Checkout code
@@ -213,3 +215,29 @@ jobs:
           body_path: release_notes.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install documentation dependencies
+        if: env.TAG_PUSHED == 'true'
+        run: |
+          poetry install --with docs
+
+      - name: Configure git for mike
+        if: env.TAG_PUSHED == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy versioned documentation
+        if: env.TAG_PUSHED == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.poetry-version.outputs.version }}"
+          echo "::notice::Deploying documentation for version $VERSION"
+          
+          # Deploy the version and set as latest
+          poetry run mike deploy --push --update-aliases $VERSION latest
+          poetry run mike set-default --push latest
+          
+          echo "::notice::Documentation deployed successfully for version $VERSION"
+          echo "::notice::Available at: https://hugodscarvalho.github.io/mlflow-assistant/"
