@@ -8,6 +8,10 @@ jobs:
   test-docs-deploy:
     name: Test Documentation Deployment
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
     
     steps:
       - name: Checkout code
@@ -48,6 +52,8 @@ jobs:
           echo "::notice::Documentation build successful!"
 
       - name: Deploy test documentation
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="${{ steps.poetry-version.outputs.version }}"
           echo "::notice::Deploying test documentation for version $VERSION"

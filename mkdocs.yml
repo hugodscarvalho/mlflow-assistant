@@ -56,7 +56,7 @@ nav:
 - Home:
   - Index: index.md
   - Installation: installation.md
-- Code Reference: reference/
+- Code Reference: reference/SUMMARY.md
 - Release Notes: changelog.md
 plugins:
 - autorefs
