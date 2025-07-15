@@ -47,8 +47,9 @@ with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
         if nav_content:
             nav_file.writelines(nav_content)
         else:
-            raise ValueError("Empty navigation content")
-    except:
+            msg = "Empty navigation content"
+            raise ValueError(msg)
+    except:  # noqa: E722
         # Fallback to manual navigation
         if nav_items:
             for parts, doc_path in sorted(nav_items):

@@ -58,6 +58,7 @@ class MLflowConnection:
         """Connect to MLflow Tracking Server.
 
         Returns
+        -------
             Tuple[bool, str]: (success, message)
 
         """
@@ -78,9 +79,11 @@ class MLflowConnection:
         """Get MLflow client instance.
 
         Returns
+        -------
             MlflowClient: MLflow client instance.
 
         Raises
+        ------
             MLflowConnectionError: If not connected to MLflow Tracking Server.
 
         """
@@ -93,6 +96,7 @@ class MLflowConnection:
         """Check if connected to MLflow Tracking Server.
 
         Returns
+        -------
             bool: True if connected, False otherwise.
 
         """
@@ -102,6 +106,7 @@ class MLflowConnection:
         """Get connection information.
 
         Returns
+        -------
             Dict[str, Any]: Connection information.
 
         """
