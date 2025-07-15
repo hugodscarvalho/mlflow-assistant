@@ -1,75 +1,134 @@
-site_name: mlflow-assistant
-site_description: Documentation for the mlflow-assistant CLI
+site_name: MLflow Assistant
+site_description: Documentation for MLflow Assistant
 site_url: https://hugodscarvalho.github.io/mlflow-assistant/
 repo_url: https://github.com/hugodscarvalho/mlflow-assistant
 repo_name: hugodscarvalho/mlflow-assistant
 use_directory_urls: true
+docs_dir: docs
+strict: false
 
 theme:
   name: material
+  font:
+    text: Geist
+    code: Geist Mono
   palette:
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: "#FAFAFA"   # Off-White
-      accent: "#BCAAA4"   # Warm Taupe
-      toggle:
-        icon: material/toggle-switch
-        name: Switch to dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: "#333333"   # Dark Charcoal
-      accent: "#D7CCC8"   # Light Taupe
-      toggle:
-        icon: material/toggle-switch-off-outline
-        name: Switch to system preference
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: "#FAFAFA" # Off-White
+    accent: "#BCAAA4" # Warm Taupe
+    toggle:
+      icon: material/toggle-switch
+      name: Switch to dark mode
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: "#333333" # Dark Charcoal
+    accent: "#D7CCC8" # Light Taupe
+    toggle:
+      icon: material/toggle-switch-off-outline
+      name: Switch to system preference
   features:
-    - navigation.instant
-    - navigation.tracking
-    - navigation.expand
-    - navigation.indexes
-    - navigation.sections
-    - content.code.copy
-    - content.code.annotate
-    - content.tabs.link # Make tabbed content linkable
-    - content.action.edit:
-        url: https://github.com/hugodscarvalho/mlflow-assistant/edit/main/docs/{path}
-        label: Edit this page
-    - search.suggest
-    - search.highlight
+  - announce.dismiss
+  - content.action.edit
+  - content.action.view
+  - content.code.annotate
+  - content.code.copy
+  - content.tabs.link
+  - content.tooltips
+  - header.autohide
+  - navigation.expand
+  - navigation.footer
+  - navigation.indexes
+  - navigation.instant
+  - navigation.path
+  - navigation.prune
+  - navigation.sections
+  - navigation.tabs
+  - navigation.tabs.sticky
+  - navigation.top
+  - navigation.tracking
+  - search.highlight
+  - search.share
+  - search.suggest
+  - toc.follow
+  - toc.integrate
 
 nav:
-  - Home: index.md
+- Home:
+  - Index: index.md
   - Installation: installation.md
-
+- Code Reference: reference/
+- Release Notes: changelog.md
 plugins:
-  - search
-  - mkdocstrings:
-      handlers:
-        python:
-          paths: [src]
-          options:
-            docstring_style: google
-            show_source: true
-            show_root_heading: true
-            heading_level: 2
-  - section-index
+- autorefs
+- search
+- gen-files:
+    scripts:
+    - docs/scripts/gen_ref_nav.py
+- literate-nav:
+    nav_file: SUMMARY.md
+- mkdocstrings:
+    handlers:
+      python:
+        paths: [ src ]
+        options:
+          docstring_style: google
+          show_source: true
+          show_root_heading: true
+          heading_level: 2
+          merge_init_into_class: yes
+          show_submodules: yes
+- section-index
+- mike:
+    alias_type: symlink
+    redirect_template: null
+    deploy_prefix: ''
+    canonical_version: null
+    version_selector: true
+    css_dir: css
+    javascript_dir: js
 
 markdown_extensions:
-  - admonition
-  - pymdownx.highlight:
-      anchor_linenums: true
-  - pymdownx.superfences
-  - pymdownx.inlinehilite
-  - pymdownx.tabbed:
-      alternate_style: true
-  - tables
-  - toc:
-      permalink: true
-
+- markdown_include.include:
+    base_path: . # CWD (project root)
+    throwException: true
+- admonition
+- def_list
+- footnotes
+- pymdownx.highlight:
+    anchor_linenums: true
+- pymdownx.inlinehilite
+- pymdownx.snippets:
+    check_paths: true
+- pymdownx.magiclink:
+    repo_url_shortener: true
+    repo_url_shorthand: true
+    social_url_shorthand: true
+    social_url_shortener: true
+    normalize_issue_symbols: true
+- pymdownx.tabbed:
+    alternate_style: true
+- toc:
+    # reduced to keep TOC nice under Changelog page
+    toc_depth: 2
+    permalink: true
+- pymdownx.superfences:
+    custom_fences:
+    - name: mermaid
+      class: mermaid
+      format: !!python/name:pymdownx.superfences.fence_code_format ""
 extra_css:
-  - stylesheets/extra.css
+- stylesheets/extra.css
 
 extra:
+  generator: false
   social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/hugodscarvalho/mlflow-assistant
+  - icon: fontawesome/brands/python
+    link: https://pypi.org/project/mlflow-assistant/
+    name: PyPI
+  - icon: fontawesome/solid/scroll
+    link: https://github.com/hugodscarvalho/mlflow-assistant/releases
+    name: Releases
+  - icon: fontawesome/brands/github-alt
+    link: https://github.com/hugodscarvalho/mlflow-assistant
+    name: GitHub
