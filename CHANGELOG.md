@@ -4,6 +4,13 @@ All notable changes to the `mlflow-assistant` package will be documented in this
 
 This project adheres to [Semantic Versioning](https://semver.org/) and follows changelog conventions inspired by [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [v0.1.3] – 2025-07-15
+
+### Fixed
+
+- Fixed navigation structure in `mkdocs.yml` to correctly point to `reference/` directory instead of `reference/SUMMARY.md`
+- Improved compatibility with `literate-nav` and `section-index` plugins for proper code reference navigation
+
 ## [v0.1.2] – 2025-07-15
 
 ### Added
