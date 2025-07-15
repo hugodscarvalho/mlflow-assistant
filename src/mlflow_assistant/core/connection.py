@@ -28,11 +28,10 @@ class MLflowConnection:
     MLflow Tracking Servers.
     """
 
-    def __init__(self, tracking_uri: str | None = None, client_factory=None):
+    def __init__(self, tracking_uri: str | None = None, client_factory: Any = None):
         """Initialize MLflow connection.
 
         Args:
-        ----
             tracking_uri: URI of the MLflow Tracking Server. If None, will try to get from environment.
             client_factory: A callable to create the MlflowClient instance. Defaults to MlflowClient.
 
@@ -46,11 +45,9 @@ class MLflowConnection:
         """Load configuration from environment variables or explicit parameters.
 
         Args:
-        ----
             tracking_uri: URI of the MLflow Tracking Server. If None, will try to get from environment.
 
         Returns:
-        -------
             MLflowConnectionConfig: Configuration for MLflow connection.
 
         """
