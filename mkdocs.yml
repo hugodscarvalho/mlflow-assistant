@@ -5,7 +5,6 @@ repo_url: https://github.com/hugodscarvalho/mlflow-assistant
 repo_name: hugodscarvalho/mlflow-assistant
 use_directory_urls: true
 docs_dir: docs
-strict: false
 
 theme:
   name: material
@@ -79,14 +78,7 @@ plugins:
           merge_init_into_class: yes
           show_submodules: yes
 - section-index
-- mike:
-    alias_type: symlink
-    redirect_template: null
-    deploy_prefix: ''
-    canonical_version: null
-    version_selector: true
-    css_dir: css
-    javascript_dir: js
+- mike
 
 markdown_extensions:
 - markdown_include.include:
@@ -121,6 +113,8 @@ extra_css:
 - stylesheets/extra.css
 
 extra:
+  version:
+    provider: mike
   generator: false
   social:
   - icon: fontawesome/brands/python

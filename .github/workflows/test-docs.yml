@@ -1,0 +1,67 @@
+name: Test Documentation Deployment
+
+on:
+  push:
+    branches: [ feature/MA-D6-add-documentation ]
+
+jobs:
+  test-docs-deploy:
+    name: Test Documentation Deployment
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies with docs
+        run: |
+          poetry install --with docs
+
+      - name: Get current Poetry version
+        id: poetry-version
+        run: |
+          CURRENT_VERSION=$(poetry version -s)
+          echo "::notice::Poetry version: $CURRENT_VERSION"
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Configure git for mike
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Test documentation build
+        run: |
+          echo "::notice::Testing documentation build..."
+          poetry run mkdocs build --strict
+          echo "::notice::Documentation build successful!"
+
+      - name: Deploy test documentation
+        run: |
+          VERSION="${{ steps.poetry-version.outputs.version }}"
+          echo "::notice::Deploying test documentation for version $VERSION"
+          
+          # Deploy as test version
+          poetry run mike deploy --push --update-aliases $VERSION-test test
+          
+          # If this is the latest test, also set as default
+          poetry run mike set-default --push test
+          
+          echo "::notice::Test documentation deployed successfully!"
+          echo "::notice::Available at: https://hugodscarvalho.github.io/mlflow-assistant/test/"
+
+      - name: List deployed versions
+        run: |
+          echo "::notice::Currently deployed versions:"
+          poetry run mike list
