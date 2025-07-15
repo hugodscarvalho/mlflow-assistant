@@ -1,6 +1,4 @@
-"""
-Main entry point for executing the MLflow Assistant package directly.
-"""
+"""Main entry point for executing the MLflow Assistant package directly."""
 
 from .cli.commands import cli
 

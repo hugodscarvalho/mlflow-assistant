@@ -1,3 +1,9 @@
+"""Pytest configuration and shared fixtures for MLflow Assistant tests.
+
+This module provides common test fixtures and configuration for both unit
+and integration tests, including temporary directories for configuration
+files and mock configurations.
+"""
 import os
 import sys
 import pytest

@@ -1,3 +1,9 @@
+"""Unit tests for CLI commands in MLflow Assistant.
+
+This module contains unit tests for the command-line interface functionality,
+including testing version command, setup wizard, start command, and mock
+query processing.
+"""
 from unittest.mock import patch
 from click.testing import CliRunner
 
@@ -32,7 +38,7 @@ class TestCliCommands:
         runner = CliRunner()
 
         with patch(
-            "mlflow_assistant.cli.commands.setup_wizard"
+            "mlflow_assistant.cli.commands.setup_wizard",
         ) as mock_wizard:
             result = runner.invoke(cli, ["setup"])
 
@@ -82,30 +88,28 @@ class TestCliCommands:
 
         with patch(
             "mlflow_assistant.cli.commands.validate_setup",
-            return_value=(True, "")
+            return_value=(True, ""),
+        ), patch(
+            "mlflow_assistant.cli.commands.get_provider_config",
+            return_value=mock_config,
+        ), patch(
+            "mlflow_assistant.cli.commands.get_mlflow_uri",
+            return_value="http://test:5000",
         ):
-            with patch(
-                "mlflow_assistant.cli.commands.get_provider_config",
-                return_value=mock_config,
-            ):
-                with patch(
-                    "mlflow_assistant.cli.commands.get_mlflow_uri",
-                    return_value="http://test:5000",
-                ):
-                    # Simulate user entering a question and then /bye
-                    result = runner.invoke(
-                        cli, ["start"], input="What is MLflow?\n/bye\n"
-                    )
+            # Simulate user entering a question and then /bye
+            result = runner.invoke(
+                cli, ["start"], input="What is MLflow?\n/bye\n",
+            )
 
-                    # Check output
-                    assert result.exit_code == 0
-                    assert "MLflow Assistant Chat Session" in result.stdout
-                    assert "Connected to MLflow at:" in result.stdout
-                    assert (
-                        "This is a mock response to: 'What is MLflow?'"
-                        in result.stdout
-                    )
-                    assert (
-                        "Thank you for using MLflow Assistant"
-                        in result.stdout
-                    )
+            # Check output
+            assert result.exit_code == 0
+            assert "MLflow Assistant Chat Session" in result.stdout
+            assert "Connected to MLflow at:" in result.stdout
+            assert (
+                "This is a mock response to: 'What is MLflow?'"
+                in result.stdout
+            )
+            assert (
+                "Thank you for using MLflow Assistant"
+                in result.stdout
+            )

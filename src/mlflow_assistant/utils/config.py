@@ -1,7 +1,13 @@
+"""Configuration management utilities for MLflow Assistant.
+
+This module provides functions for loading, saving, and accessing configuration
+settings for MLflow Assistant, including MLflow URI and AI provider settings.
+Configuration is stored in YAML format in the user's home directory.
+"""
 import os
 import yaml
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Any
 import logging
 
 from .constants import (
@@ -24,8 +30,8 @@ logger = logging.getLogger("mlflow_assistant.utils.config")
 # Support testing by allowing override via environment variable
 CONFIG_DIR = Path(
     os.environ.get(
-        "MLFLOW_ASSISTANT_CONFIG_DIR", str(Path.home() / CONFIG_DIRNAME)
-    )
+        "MLFLOW_ASSISTANT_CONFIG_DIR", str(Path.home() / CONFIG_DIRNAME),
+    ),
 )
 CONFIG_FILE = CONFIG_DIR / CONFIG_FILENAME
 
@@ -37,14 +43,14 @@ def ensure_config_dir():
         logger.info(f"Created configuration directory at {CONFIG_DIR}")
 
 
-def load_config() -> Dict[str, Any]:
+def load_config() -> dict[str, Any]:
     """Load configuration from file."""
     if not CONFIG_FILE.exists():
         logger.info(f"No configuration file found at {CONFIG_FILE}")
         return {}
 
     try:
-        with open(CONFIG_FILE, "r") as f:
+        with open(CONFIG_FILE) as f:
             config = yaml.safe_load(f) or {}
             logger.debug(f"Loaded configuration: {config}")
             return config
@@ -53,15 +59,15 @@ def load_config() -> Dict[str, Any]:
         return {}
 
 
-def save_config(config: Dict[str, Any]) -> bool:
-    """
-    Save configuration to file.
+def save_config(config: dict[str, Any]) -> bool:
+    """Save configuration to file.
 
     Args:
         config: Configuration dictionary to save
 
     Returns:
         bool: True if successful, False otherwise
+
     """
     ensure_config_dir()
 
@@ -75,12 +81,12 @@ def save_config(config: Dict[str, Any]) -> bool:
         return False
 
 
-def get_mlflow_uri() -> Optional[str]:
-    """
-    Get the MLflow URI from config or environment.
+def get_mlflow_uri() -> str | None:
+    """Get the MLflow URI from config or environment.
 
     Returns:
         Optional[str]: The MLflow URI or None if not configured
+
     """
     # Environment variable should take precedence
     if mlflow_uri_env := os.environ.get(MLFLOW_URI_ENV):
@@ -91,12 +97,12 @@ def get_mlflow_uri() -> Optional[str]:
     return config.get(CONFIG_KEY_MLFLOW_URI)
 
 
-def get_provider_config() -> Dict[str, Any]:
-    """
-    Get the AI provider configuration.
+def get_provider_config() -> dict[str, Any]:
+    """Get the AI provider configuration.
 
     Returns:
         Dict[str, Any]: The provider configuration
+
     """
     config = load_config()
     provider = config.get(CONFIG_KEY_PROVIDER, {})
@@ -111,16 +117,16 @@ def get_provider_config() -> Dict[str, Any]:
             CONFIG_KEY_TYPE: Provider.OPENAI.value,
             CONFIG_KEY_API_KEY: api_key,
             CONFIG_KEY_MODEL: provider.get(
-                CONFIG_KEY_MODEL, Provider.get_default_model(Provider.OPENAI)
+                CONFIG_KEY_MODEL, Provider.get_default_model(Provider.OPENAI),
             ),
         }
 
-    elif provider_type == Provider.OLLAMA.value:
+    if provider_type == Provider.OLLAMA.value:
         return {
             CONFIG_KEY_TYPE: Provider.OLLAMA.value,
             CONFIG_KEY_URI: provider.get(CONFIG_KEY_URI, DEFAULT_OLLAMA_URI),
             CONFIG_KEY_MODEL: provider.get(
-                CONFIG_KEY_MODEL, Provider.get_default_model(Provider.OLLAMA)
+                CONFIG_KEY_MODEL, Provider.get_default_model(Provider.OLLAMA),
             ),
         }
 

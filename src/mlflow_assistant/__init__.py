@@ -1,6 +1,4 @@
-"""
-MLflow Assistant: Interact with MLflow using LLMs
-"""
+"""MLflow Assistant: Interact with MLflow using LLMs."""
 
 __version__ = "0.1.0"
 

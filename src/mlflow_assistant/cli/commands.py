@@ -1,18 +1,15 @@
+"""CLI commands for MLflow Assistant.
+
+This module contains the main CLI commands for interacting with MLflow
+using natural language queries through various AI providers.
+"""
 import click
 import logging
-from typing import Dict, Any
+from typing import Any
 
 # Internal imports
-from ..utils.config import load_config, get_mlflow_uri, get_provider_config
-from ..utils.constants import (
-    Command,
-    CONFIG_KEY_MLFLOW_URI,
-    CONFIG_KEY_PROVIDER,
-    CONFIG_KEY_TYPE,
-    CONFIG_KEY_MODEL,
-    DEFAULT_STATUS_NOT_CONFIGURED,
-    LOG_FORMAT,
-)
+from mlflow_assistant.utils.config import load_config, get_mlflow_uri, get_provider_config
+from mlflow_assistant.utils.constants import Command, CONFIG_KEY_MLFLOW_URI, CONFIG_KEY_PROVIDER, CONFIG_KEY_TYPE, CONFIG_KEY_MODEL, DEFAULT_STATUS_NOT_CONFIGURED, LOG_FORMAT
 from .setup import setup_wizard
 from .validation import validate_setup
 
@@ -20,12 +17,79 @@ from .validation import validate_setup
 logger = logging.getLogger("mlflow_assistant.cli")
 
 
+def _handle_special_commands(query: str) -> str | None:
+    """Handle special chat commands.
+
+    Args:
+        query: The user's input query
+
+    Returns:
+        Action to take ('exit', 'help', 'clear', 'continue') or None to process normally
+
+    """
+    query_lower = query.lower()
+
+    if query_lower == Command.EXIT.value:
+        click.echo("\nThank you for using MLflow Assistant! Goodbye.")
+        return "exit"
+
+    if query_lower == Command.HELP.value:
+        click.echo("\nAvailable commands:")
+        for cmd in Command:
+            click.echo(f"  {cmd.value:<7} - {cmd.description}")
+        return "continue"
+
+    if query_lower == Command.CLEAR.value:
+        # This is a simple approximation of clear screen
+        click.echo("\n" * 50)
+        return "continue"
+
+    if not query:
+        return "continue"  # Skip empty queries
+
+    return None  # Process normally
+
+
+def _process_user_query(query: str, provider_config: dict, verbose: bool) -> None:
+    """Process a user query and display the response.
+
+    Args:
+        query: The user's query
+        provider_config: The AI provider configuration
+        verbose: Whether to show verbose output
+
+    """
+    try:
+        # This is a mock function call
+        result = mock_process_query(query, provider_config, verbose)
+
+        # Display response
+        click.echo(f"\n🤖 {result['response']}")
+
+        # Show verbose info if requested
+        if verbose:
+            provider_type = provider_config.get(
+                CONFIG_KEY_TYPE, DEFAULT_STATUS_NOT_CONFIGURED,
+            )
+            model = provider_config.get(
+                CONFIG_KEY_MODEL, DEFAULT_STATUS_NOT_CONFIGURED,
+            )
+            click.echo("\n--- Debug Information ---")
+            click.echo(f"Provider: {provider_type}")
+            click.echo(f"Model: {model}")
+            click.echo("Query processed with mock function")
+            click.echo("-------------------------")
+
+    except Exception as e:
+        click.echo(f"\n❌ Error processing query: {e!s}")
+
+
 # Mock function for process_query since it's not implemented yet
 def mock_process_query(
-    query: str, provider_config: Dict[str, Any], verbose: bool = False
-) -> Dict[str, Any]:
-    """
-    Mock function that simulates the query processing workflow.
+    query: str, provider_config: dict[str, Any], verbose: bool = False,
+) -> dict[str, Any]:
+    """Mock function that simulates the query processing workflow.
+
     This will be replaced with the actual implementation later.
 
     Args:
@@ -35,14 +99,23 @@ def mock_process_query(
 
     Returns:
         Dictionary with mock response information
+
     """
     # Create a mock response
     provider_type = provider_config.get(
-        CONFIG_KEY_TYPE, DEFAULT_STATUS_NOT_CONFIGURED
+        CONFIG_KEY_TYPE, DEFAULT_STATUS_NOT_CONFIGURED,
     )
     model = provider_config.get(
-        CONFIG_KEY_MODEL, DEFAULT_STATUS_NOT_CONFIGURED
+        CONFIG_KEY_MODEL, DEFAULT_STATUS_NOT_CONFIGURED,
     )
+
+    response_text = (
+        f"This is a mock response to: '{query}'\n\n"
+        f"The MLflow integration will be implemented soon!"
+    )
+
+    if verbose:
+        response_text += f"\n\nDebug: Using {provider_type} with {model}"
 
     return {
         "original_query": query,
@@ -51,8 +124,7 @@ def mock_process_query(
             CONFIG_KEY_MODEL: model,
         },
         "enhanced": False,
-        "response": f"This is a mock response to: '{query}'\n\n"
-        f"The MLflow integration will be implemented soon!",
+        "response": response_text,
     }
 
 
@@ -107,10 +179,10 @@ def start(verbose):
 
     # Print welcome message and instructions
     provider_type = provider_config.get(
-        CONFIG_KEY_TYPE, DEFAULT_STATUS_NOT_CONFIGURED
+        CONFIG_KEY_TYPE, DEFAULT_STATUS_NOT_CONFIGURED,
         )
     model = provider_config.get(
-        CONFIG_KEY_MODEL, DEFAULT_STATUS_NOT_CONFIGURED
+        CONFIG_KEY_MODEL, DEFAULT_STATUS_NOT_CONFIGURED,
         )
 
     click.echo("\n🤖 MLflow Assistant Chat Session")
@@ -121,7 +193,6 @@ def start(verbose):
     click.echo("=" * 70)
 
     # Start interactive loop
-    history = []
     while True:
         # Get user input with a prompt
         try:
@@ -131,61 +202,33 @@ def start(verbose):
             break
 
         # Handle special commands
-        if query.lower() == Command.EXIT.value:
-            click.echo("\nThank you for using MLflow Assistant! Goodbye.")
+        action = _handle_special_commands(query)
+        if action == "exit":
             break
-        elif query.lower() == Command.HELP.value:
-            click.echo("\nAvailable commands:")
-            for cmd in Command:
-                click.echo(f"  {cmd.value:<7} - {cmd.description}")
+        if action == "continue":
             continue
-        elif query.lower() == Command.CLEAR.value:
-            # This is a simple approximation of clear screen
-            click.echo("\n" * 50)
-            continue
-        elif not query:
-            continue  # Skip empty queries
 
         # Process the query
-        try:
-            # This is a mock function call
-            result = mock_process_query(query, provider_config, verbose)
-
-            # Add to history
-            history.append({"query": query, "response": result["response"]})
-
-            # Display response
-            click.echo(f"\n🤖 {result['response']}")
-
-            # Show verbose info if requested
-            if verbose:
-                click.echo("\n--- Debug Information ---")
-                click.echo(f"Provider: {provider_type}")
-                click.echo(f"Model: {model}")
-                click.echo("Query processed with mock function")
-                click.echo("-------------------------")
-
-        except Exception as e:
-            click.echo(f"\n❌ Error processing query: {str(e)}")
+        _process_user_query(query, provider_config, verbose)
 
 
 @cli.command()
 def version():
     """Show MLflow Assistant version information."""
-    from .. import __version__
+    from mlflow_assistant import __version__
 
     click.echo(f"MLflow Assistant version: {__version__}")
 
     # Show configuration
     config = load_config()
     mlflow_uri = config.get(
-        CONFIG_KEY_MLFLOW_URI, DEFAULT_STATUS_NOT_CONFIGURED
+        CONFIG_KEY_MLFLOW_URI, DEFAULT_STATUS_NOT_CONFIGURED,
         )
     provider = config.get(CONFIG_KEY_PROVIDER, {}).get(
-        CONFIG_KEY_TYPE, DEFAULT_STATUS_NOT_CONFIGURED
+        CONFIG_KEY_TYPE, DEFAULT_STATUS_NOT_CONFIGURED,
     )
     model = config.get(CONFIG_KEY_PROVIDER, {}).get(
-        CONFIG_KEY_MODEL, DEFAULT_STATUS_NOT_CONFIGURED
+        CONFIG_KEY_MODEL, DEFAULT_STATUS_NOT_CONFIGURED,
     )
 
     click.echo(f"MLflow URI: {mlflow_uri}")

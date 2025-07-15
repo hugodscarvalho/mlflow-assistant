@@ -1,3 +1,1 @@
-"""
-CLI modules for MLflow Assistant.
-"""
+"""CLI modules for MLflow Assistant."""

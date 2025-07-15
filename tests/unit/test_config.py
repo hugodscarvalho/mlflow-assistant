@@ -1,3 +1,9 @@
+"""Unit tests for configuration management utilities.
+
+This module contains unit tests for the configuration loading, saving,
+and retrieval functions, including tests for MLflow URI handling and
+AI provider configuration management.
+"""
 import os
 from pathlib import Path
 from unittest.mock import patch
@@ -38,48 +44,37 @@ class TestConfig:
         config_file = Path(temp_config_dir) / "config.yaml"
 
         # Test saving
-        with patch("mlflow_assistant.utils.config.CONFIG_FILE", config_file):
-            with patch(
-                "mlflow_assistant.utils.config.CONFIG_DIR",
-                Path(temp_config_dir)
-            ):
-                save_config(test_config)
+        with patch("mlflow_assistant.utils.config.CONFIG_FILE", config_file), \
+             patch("mlflow_assistant.utils.config.CONFIG_DIR", Path(temp_config_dir)):
+            save_config(test_config)
 
-                # Test loading
-                loaded_config = load_config()
+            # Test loading
+            loaded_config = load_config()
 
-                # Compare configs
-                assert loaded_config == test_config
+            # Compare configs
+            assert loaded_config == test_config
 
     def test_get_mlflow_uri_from_config(self, mock_config):
         """Test getting MLflow URI from config."""
-        with patch(
-            "mlflow_assistant.utils.config.load_config",
-            return_value=mock_config
-        ):
+        with patch("mlflow_assistant.utils.config.load_config", return_value=mock_config), \
+             patch.dict("os.environ", {}, clear=True):
             # Test with no environment variable
-            with patch.dict("os.environ", {}, clear=True):
-                uri = get_mlflow_uri()
-                assert uri == "http://test-mlflow:5000"
+            uri = get_mlflow_uri()
+            assert uri == "http://test-mlflow:5000"
 
     def test_get_mlflow_uri_from_env(self, mock_config):
         """Test that environment variable takes precedence."""
-        with patch(
-            "mlflow_assistant.utils.config.load_config",
-            return_value=mock_config
-        ):
+        with patch("mlflow_assistant.utils.config.load_config", return_value=mock_config), \
+             patch.dict("os.environ", {"MLFLOW_TRACKING_URI": "http://env-uri:9000"}):
             # Test with environment variable set
-            with patch.dict(
-                "os.environ", {"MLFLOW_TRACKING_URI": "http://env-uri:9000"}
-            ):
-                uri = get_mlflow_uri()
-                assert uri == "http://env-uri:9000"
+            uri = get_mlflow_uri()
+            assert uri == "http://env-uri:9000"
 
     def test_get_provider_config_openai(self, mock_config):
         """Test getting OpenAI provider config."""
         with patch(
             "mlflow_assistant.utils.config.load_config",
-            return_value=mock_config
+            return_value=mock_config,
         ):
             provider = get_provider_config()
             assert provider["type"] == "openai"
@@ -89,9 +84,8 @@ class TestConfig:
         """Test that OpenAI key from environment takes precedence."""
         with patch(
             "mlflow_assistant.utils.config.load_config",
-            return_value=mock_config
-        ):
-            with patch.dict("os.environ",
-                            {"OPENAI_API_KEY": "test-key-from-env"}):
-                provider = get_provider_config()
-                assert provider["api_key"] == "test-key-from-env"
+            return_value=mock_config,
+        ), patch.dict("os.environ",
+                        {"OPENAI_API_KEY": "test-key-from-env"}):
+            provider = get_provider_config()
+            assert provider["api_key"] == "test-key-from-env"

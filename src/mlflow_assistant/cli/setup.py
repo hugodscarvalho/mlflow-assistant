@@ -1,21 +1,16 @@
+"""Setup wizard for MLflow Assistant configuration.
+
+This module provides an interactive setup wizard that guides users through
+configuring MLflow Assistant, including MLflow connection settings and
+AI provider configuration (OpenAI or Ollama).
+"""
 import os
 import click
 import logging
 
-from ..utils.config import load_config, save_config
+from mlflow_assistant.utils.config import load_config, save_config
 from .validation import validate_mlflow_uri, validate_ollama_connection
-from ..utils.constants import (
-    Provider,
-    OpenAIModel,
-    CONFIG_KEY_MLFLOW_URI,
-    CONFIG_KEY_PROVIDER,
-    CONFIG_KEY_TYPE,
-    CONFIG_KEY_MODEL,
-    CONFIG_KEY_URI,
-    DEFAULT_MLFLOW_URI,
-    DEFAULT_OLLAMA_URI,
-    OPENAI_API_KEY_ENV,
-)
+from mlflow_assistant.utils.constants import Provider, OpenAIModel, CONFIG_KEY_MLFLOW_URI, CONFIG_KEY_PROVIDER, CONFIG_KEY_TYPE, CONFIG_KEY_MODEL, CONFIG_KEY_URI, DEFAULT_MLFLOW_URI, DEFAULT_OLLAMA_URI, OPENAI_API_KEY_ENV
 
 logger = logging.getLogger("mlflow_assistant.setup")
 
@@ -42,21 +37,20 @@ def setup_wizard():
     if not validate_mlflow_uri(mlflow_uri):
         click.echo("\n⚠️  Warning: Could not connect to MLflow URI.")
         click.echo(
-            "    Please ensure MLflow is running."
+            "    Please ensure MLflow is running.",
         )
         click.echo(
             "    Common MLflow URLs: http://localhost:5000, "
-            "http://localhost:8080"
+            "http://localhost:8080",
         )
         if not click.confirm(
-            "Continue anyway? (Choose Yes if you're sure MLflow is running)"
+            "Continue anyway? (Choose Yes if you're sure MLflow is running)",
         ):
             click.echo(
                 "Setup aborted. "
                 "Please ensure MLflow is running and try again.")
             return
-        else:
-            click.echo("Continuing with setup using the provided MLflow URI.")
+        click.echo("Continuing with setup using the provided MLflow URI.")
     else:
         click.echo("✅ Successfully connected to MLflow!")
 
@@ -88,7 +82,7 @@ def setup_wizard():
         provider_config = {
             CONFIG_KEY_TYPE: Provider.OPENAI.value,
             CONFIG_KEY_MODEL: Provider.get_default_model(
-                Provider.OPENAI
+                Provider.OPENAI,
             ),  # Will be updated after user selection
         }
 
@@ -96,15 +90,15 @@ def setup_wizard():
         api_key = os.environ.get(OPENAI_API_KEY_ENV)
         if not api_key:
             click.echo(
-                "\n⚠️  OpenAI API key not found in environment variables."
+                "\n⚠️  OpenAI API key not found in environment variables.",
             )
             click.echo(
-                f"Please export your OpenAI API key as {OPENAI_API_KEY_ENV}."
+                f"Please export your OpenAI API key as {OPENAI_API_KEY_ENV}.",
             )
             click.echo(f"Example: export {OPENAI_API_KEY_ENV}='your-key-here'")
             if not click.confirm("Continue without API key?"):
                 click.echo(
-                    "Setup aborted. Please set the API key and try again."
+                    "Setup aborted. Please set the API key and try again.",
                 )
                 return
         else:
@@ -119,7 +113,7 @@ def setup_wizard():
             suggested_model = Provider.get_default_model(Provider.OPENAI)
         else:
             current_model = config.get(CONFIG_KEY_PROVIDER, {}).get(
-                CONFIG_KEY_MODEL, Provider.get_default_model(Provider.OPENAI)
+                CONFIG_KEY_MODEL, Provider.get_default_model(Provider.OPENAI),
             )
             suggested_model = (
                 current_model
@@ -138,14 +132,14 @@ def setup_wizard():
         # If switching from another provider, automatically set defaults
         if provider_changed:
             click.echo(
-                "\n✅ Switching to Ollama provider with default URI and model"
+                "\n✅ Switching to Ollama provider with default URI and model",
             )
 
         # Ollama configuration - always ask for URI
         ollama_uri = click.prompt(
             "\nEnter your Ollama server URI",
             default=config.get(CONFIG_KEY_PROVIDER, {}).get(
-                CONFIG_KEY_URI, DEFAULT_OLLAMA_URI
+                CONFIG_KEY_URI, DEFAULT_OLLAMA_URI,
             ),
         )
 
@@ -154,7 +148,7 @@ def setup_wizard():
             CONFIG_KEY_TYPE: Provider.OLLAMA.value,
             CONFIG_KEY_URI: ollama_uri,
             CONFIG_KEY_MODEL: Provider.get_default_model(
-                Provider.OLLAMA
+                Provider.OLLAMA,
             ),  # Will be updated if user selects a different model
         }
 
@@ -168,7 +162,7 @@ def setup_wizard():
 
             if available_models:
                 click.echo(
-                    f"\nAvailable Ollama models: {', '.join(available_models)}"
+                    f"\nAvailable Ollama models: {', '.join(available_models)}",
                 )
 
                 # If changing providers, suggest the default,
@@ -182,7 +176,7 @@ def setup_wizard():
                     )
                 else:
                     current_model = config.get(CONFIG_KEY_PROVIDER, {}).get(
-                        CONFIG_KEY_MODEL
+                        CONFIG_KEY_MODEL,
                     )
                     suggested_model = (
                         current_model
@@ -202,19 +196,19 @@ def setup_wizard():
                     "Enter the Ollama model to use",
                     default=config.get(CONFIG_KEY_PROVIDER, {}).get(
                         CONFIG_KEY_MODEL, Provider.get_default_model(
-                            Provider.OLLAMA
-                        )
+                            Provider.OLLAMA,
+                        ),
                     ),
                 )
                 provider_config[CONFIG_KEY_MODEL] = ollama_model
         else:
             click.echo(
                 "\n⚠️  Warning: Ollama server not running or"
-                " not accessible at this URI."
+                " not accessible at this URI.",
             )
             if not click.confirm("Continue anyway?"):
                 click.echo(
-                    "Setup aborted. Please start Ollama server and try again."
+                    "Setup aborted. Please start Ollama server and try again.",
                 )
                 return
 
@@ -223,8 +217,8 @@ def setup_wizard():
                 "Enter the Ollama model to use",
                 default=config.get(CONFIG_KEY_PROVIDER, {}).get(
                     CONFIG_KEY_MODEL, Provider.get_default_model(
-                        Provider.OLLAMA
-                    )
+                        Provider.OLLAMA,
+                    ),
                 ),
             )
             provider_config[CONFIG_KEY_MODEL] = ollama_model
@@ -242,11 +236,11 @@ def setup_wizard():
         "\nYou can now use MLflow Assistant with the following commands:")
     click.echo(
         "  mlflow-assistant start     - Start an interactive chat "
-        "session."
+        "session.",
     )
     click.echo(
         "  mlflow-assistant version   - Show version "
-        "information."
+        "information.",
     )
 
     click.echo("\nFor more information, use 'mlflow-assistant --help'")
