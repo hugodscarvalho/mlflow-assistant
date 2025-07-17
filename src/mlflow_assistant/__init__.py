@@ -1,6 +1,7 @@
-"""MLflow Assistant Package.
+"""MLflow Assistant: Interact with MLflow using LLMs."""
 
-This package provides functionality to interact with MLflow servers using natural language
-interfaces powered by large language models (LLMs). It includes modules for managing MLflow
-connections, workflows, and providers.
-"""
+__version__ = "0.1.0"
+
+from .cli.commands import cli
+
+__all__ = ["cli"]
