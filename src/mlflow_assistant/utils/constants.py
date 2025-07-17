@@ -1,3 +1,9 @@
+"""Constants and enumerations for MLflow Assistant.
+
+This module defines configuration keys, default values, API endpoints,
+model definitions, and other constants used throughout MLflow Assistant.
+It includes enums for AI providers (OpenAI, Ollama) and their supported models.
+"""
 from enum import Enum
 
 # Configuration keys
