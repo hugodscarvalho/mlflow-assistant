@@ -75,12 +75,25 @@ class OllamaModel(Enum):
         return [model.value for model in cls]
 
 
+# Default Databricks model names
+class DatabricksModel(Enum):
+    """Databricks models supported by MLflow Assistant."""
+
+    DATABRICKS_META_LLAMA3 = "databricks-meta-llama-3-3-70b-instruct"
+
+    @classmethod
+    def choices(cls):
+        """Get all available Databricks model choices."""
+        return [model.value for model in cls]
+
+
 # Provider types
 class Provider(Enum):
     """AI provider types supported by MLflow Assistant."""
 
     OPENAI = "openai"
     OLLAMA = "ollama"
+    DATABRICKS = "databricks"
 
     @classmethod
     def get_default_model(cls, provider):
@@ -88,6 +101,17 @@ class Provider(Enum):
         defaults = {
             cls.OPENAI: OpenAIModel.GPT35.value,
             cls.OLLAMA: OllamaModel.LLAMA32.value,
+            cls.DATABRICKS: DatabricksModel.DATABRICKS_META_LLAMA3.value,
+        }
+        return defaults.get(provider)
+
+    @classmethod
+    def get_default_temperature(cls, provider):
+        """Get the default temperature for a provider."""
+        defaults = {
+            cls.OPENAI: 0.7,
+            cls.DATABRICKS: 0.7,
+            cls.OLLAMA: 0.7,
         }
         return defaults.get(provider)
 

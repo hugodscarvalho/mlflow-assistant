@@ -67,7 +67,6 @@ def save_config(config: dict[str, Any]) -> bool:
 
     Returns:
         bool: True if successful, False otherwise
-
     """
     ensure_config_dir()
 
