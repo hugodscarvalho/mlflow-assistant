@@ -1,7 +1,8 @@
 """Providers utilities."""
 import logging
-import subprocess
+import subprocess  # noqa: S404
 
+import shutil
 import requests
 from mlflow_assistant.utils.constants import DEFAULT_OLLAMA_URI
 
@@ -23,7 +24,7 @@ def get_ollama_models(uri: str = DEFAULT_OLLAMA_URI) -> list:
     """Fetch the list of available Ollama models."""
     # Try using direct API call first
     try:
-        response = requests.get(f"{uri}/api/tags")
+        response = requests.get(f"{uri}/api/tags", timeout=10)
         if response.status_code == 200:
             data = response.json()
             models = [m.get("name") for m in data.get("models", [])]
@@ -34,8 +35,10 @@ def get_ollama_models(uri: str = DEFAULT_OLLAMA_URI) -> list:
 
     try:
         # Execute the Ollama list command
-        result = subprocess.run(
-            ["ollama", "list"], capture_output=True, text=True, check=False
+        ollama_path = shutil.which("ollama")
+
+        result = subprocess.run(  # noqa: S603
+            [ollama_path, "list"], capture_output=True, text=True, check=False,
         )
 
         # Check if command executed successfully
@@ -50,8 +53,8 @@ def get_ollama_models(uri: str = DEFAULT_OLLAMA_URI) -> list:
 
         # Skip header line and extract the first column (model name)
         models = [line.split()[0] for line in lines[1:]]
-        return models if models else FALLBACK_MODELS
+        return models or FALLBACK_MODELS
 
     except (subprocess.SubprocessError, FileNotFoundError, IndexError) as e:
-        logger.warning(f"Error fetching Ollama models: {str(e)}")
+        logger.warning(f"Error fetching Ollama models: {e!s}")
         return FALLBACK_MODELS

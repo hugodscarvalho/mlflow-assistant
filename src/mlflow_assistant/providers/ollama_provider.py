@@ -18,17 +18,15 @@ class OllamaProvider(AIProvider):
         # Handle None URI case to prevent attribute errors
         if uri is None:
             logger.warning(
-                f"Ollama URI is None. Using default URI: {DEFAULT_OLLAMA_URI}"
+                f"Ollama URI is None. Using default URI: {DEFAULT_OLLAMA_URI}",
             )
             self.uri = DEFAULT_OLLAMA_URI
         else:
             self.uri = uri.rstrip("/")
 
-        self.model_name = model if model else OllamaModel.LLAMA32.value
+        self.model_name = model or OllamaModel.LLAMA32.value
         self.temperature = (
-            temperature
-            if temperature
-            else Provider.get_default_temperature(Provider.OLLAMA.value)
+            temperature or Provider.get_default_temperature(Provider.OLLAMA.value)
         )
 
         # Store kwargs for later use when creating specialized models
@@ -50,7 +48,7 @@ class OllamaProvider(AIProvider):
         self.model = ChatOllama(**model_params)
 
         logger.info(
-            f"Ollama provider initialized with model {self.model_name} at {self.uri}"
+            f"Ollama provider initialized with model {self.model_name} at {self.uri}",
         )
 
     @property

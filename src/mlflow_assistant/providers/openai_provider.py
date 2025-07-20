@@ -1,6 +1,5 @@
 """OpenAI provider for MLflow Assistant."""
 import logging
-from typing import Optional
 
 from langchain_openai import ChatOpenAI
 from mlflow_assistant.utils.constants import OpenAIModel, Provider
@@ -18,16 +17,14 @@ class OpenAIProvider(AIProvider):
         self,
         api_key=None,
         model=OpenAIModel.GPT35.value,
-        temperature: Optional[float] = None,
+        temperature: float | None = None,
         **kwargs,
     ):
         """Initialize the OpenAI provider with API key and model."""
         self.api_key = api_key
-        self.model_name = model if model else OpenAIModel.GPT35.value
+        self.model_name = model or OpenAIModel.GPT35.value
         self.temperature = (
-            temperature
-            if temperature
-            else Provider.get_default_temperature(Provider.OPENAI.value)
+            temperature or Provider.get_default_temperature(Provider.OPENAI.value)
         )
         self.kwargs = kwargs
 

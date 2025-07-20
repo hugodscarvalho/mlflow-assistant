@@ -1,11 +1,10 @@
-"""
-Core LangGraph-based workflow engine for processing user queries and generating responses using an AI provider.
+"""Core LangGraph-based workflow engine for processing user queries and generating responses using an AI provider.
 
 This workflow supports tool-augmented generation: tool calls are detected and executed in a loop
 until a final AI response is produced.
 """
 import logging
-from typing import Annotated, Any, Dict, List
+from typing import Annotated, Any
 
 from langchain_core.messages import BaseMessage
 from langgraph.graph import StateGraph
@@ -30,8 +29,8 @@ tools = [list_models, list_experiments, get_model_details, get_system_info]
 class State(TypedDict):
     """State schema for the workflow engine."""
 
-    messages: Annotated[List[BaseMessage], add_messages]
-    provider_config: Dict[str, Any]  # Model/provider configuration
+    messages: Annotated[list[BaseMessage], add_messages]
+    provider_config: dict[str, Any]  # Model/provider configuration
     mlflow_uri: str  # MLflow URI
 
 

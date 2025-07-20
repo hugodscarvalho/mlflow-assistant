@@ -1,8 +1,6 @@
-"""
-Query processor that leverages the workflow engine for processing user queries and generating responses using an AI provider.
-"""
+"""Query processor that leverages the workflow engine for processing user queries and generating responses using an AI provider."""
 import logging
-from typing import Any, Dict
+from typing import Any
 
 from langchain_core.messages import HumanMessage
 from mlflow_assistant.engine.definitions import (
@@ -15,10 +13,9 @@ logger = logging.getLogger("mlflow_assistant.engine.processor")
 
 
 async def process_query(
-    query: str, provider_config: Dict[str, Any], verbose: bool = False
-) -> Dict[str, Any]:
-    """
-    Process a query through the MLflow Assistant workflow.
+    query: str, provider_config: dict[str, Any], verbose: bool = False,
+) -> dict[str, Any]:
+    """Process a query through the MLflow Assistant workflow.
 
     Args:
         query: The query to process
@@ -27,6 +24,7 @@ async def process_query(
 
     Returns:
         Dict containing the response
+
     """
     import time
 
@@ -49,7 +47,7 @@ async def process_query(
             logger.info(f"Running workflow with query: {query}")
             logger.info(f"Using provider: {provider_config.get(CONFIG_KEY_TYPE)}")
             logger.info(
-                f"Using model: {provider_config.get(CONFIG_KEY_MODEL, 'default')}"
+                f"Using model: {provider_config.get(CONFIG_KEY_MODEL, 'default')}",
             )
 
         result = await workflow.ainvoke(initial_state)
@@ -57,23 +55,20 @@ async def process_query(
         # Calculate duration
         duration = time.time() - start_time
 
-        response = {
+        return {
             "original_query": query,
             "response": result.get(STATE_KEY_MESSAGES)[-1],
             "duration": duration,  # Add duration to response
         }
-
-        return response
 
     except Exception as e:
         # Calculate duration even for errors
         duration = time.time() - start_time
 
         logger.error(f"Error processing query: {e}")
-        error_response = {
+
+        return {
             "error": str(e),
             "original_query": query,
-            "response": f"Error processing query: {str(e)}",
+            "response": f"Error processing query: {e!s}",
         }
-
-        return error_response

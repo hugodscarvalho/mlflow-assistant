@@ -1,7 +1,6 @@
 """Databricks provider for MLflow Assistant."""
 import logging
 import os
-from typing import Optional
 
 from databricks_langchain import ChatDatabricks
 from mlflow_assistant.utils.constants import Provider
@@ -17,18 +16,16 @@ class DatabricksProvider(AIProvider):
 
     def __init__(
         self,
-        model: Optional[str] = None,
-        temperature: Optional[float] = None,
+        model: str | None = None,
+        temperature: float | None = None,
         **kwargs,
     ):
         """Initialize the Databricks provider with model."""
         self.model_name = (
-            model if model else Provider.get_default_model(Provider.DATABRICKS.value)
+            model or Provider.get_default_model(Provider.DATABRICKS.value)
         )
         self.temperature = (
-            temperature
-            if temperature
-            else Provider.get_default_temperature(Provider.DATABRICKS.value)
+            temperature or Provider.get_default_temperature(Provider.DATABRICKS.value)
         )
         self.kwargs = kwargs
 
@@ -36,7 +33,7 @@ class DatabricksProvider(AIProvider):
             if var not in os.environ:
                 logger.warning(
                     f"Missing environment variable: {var}. "
-                    "Responses may fail if you are running outside Databricks."
+                    "Responses may fail if you are running outside Databricks.",
                 )
 
         # Build parameters dict with only non-None values

@@ -1,7 +1,8 @@
 """Base class for AI providers."""
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Type
+from typing import Any
+from typing import ClassVar
 
 from mlflow_assistant.utils.config import (
     CONFIG_KEY_API_KEY,
@@ -21,7 +22,7 @@ class AIProvider(ABC):
     """Abstract base class for AI providers."""
 
     # Registry for provider classes
-    _providers: Dict[str, Type["AIProvider"]] = {}
+    _providers: ClassVar[dict[str, type["AIProvider"]]] = {}
 
     def __init_subclass__(cls, **kwargs):
         """Auto-register provider subclasses."""
@@ -35,15 +36,15 @@ class AIProvider(ABC):
     @abstractmethod
     def langchain_model(self):
         """Get the underlying LangChain model."""
-        pass
 
     @classmethod
-    def create(cls, config: Dict[str, Any]) -> "AIProvider":
-        """Factory method to create an AI provider based on configuration."""
+    def create(cls, config: dict[str, Any]) -> "AIProvider":
+        """Create an AI provider based on configuration."""
         provider_type = config.get(CONFIG_KEY_TYPE)
 
         if not provider_type:
-            raise ValueError("Provider type not specified in configuration")
+            error_msg = "Provider type not specified in configuration"
+            raise ValueError(error_msg)
 
         provider_type = provider_type.lower()
 
@@ -58,12 +59,12 @@ class AIProvider(ABC):
             from .openai_provider import OpenAIProvider
 
             logger.info(
-                f"Creating OpenAI provider with model {config.get(CONFIG_KEY_MODEL, Provider.get_default_model(Provider.OPENAI))}"
+                f"Creating OpenAI provider with model {config.get(CONFIG_KEY_MODEL, Provider.get_default_model(Provider.OPENAI))}",
             )
             return OpenAIProvider(
                 api_key=config.get(CONFIG_KEY_API_KEY),
                 model=config.get(
-                    CONFIG_KEY_MODEL, Provider.get_default_model(Provider.OPENAI)
+                    CONFIG_KEY_MODEL, Provider.get_default_model(Provider.OPENAI),
                 ),
                 temperature=config.get(
                     ParameterKeys.TEMPERATURE.value,
@@ -71,11 +72,11 @@ class AIProvider(ABC):
                 ),
                 **kwargs,
             )
-        elif provider_type == Provider.OLLAMA.value:
+        if provider_type == Provider.OLLAMA.value:
             from .ollama_provider import OllamaProvider
 
             logger.info(
-                f"Creating Ollama provider with model {config.get(CONFIG_KEY_MODEL)}"
+                f"Creating Ollama provider with model {config.get(CONFIG_KEY_MODEL)}",
             )
             return OllamaProvider(
                 uri=config.get(CONFIG_KEY_URI),
@@ -86,11 +87,11 @@ class AIProvider(ABC):
                 ),
                 **kwargs,
             )
-        elif provider_type == Provider.DATABRICKS.value:
+        if provider_type == Provider.DATABRICKS.value:
             from .databricks_provider import DatabricksProvider
 
             logger.info(
-                f"Creating Databricks provider with model {config.get(CONFIG_KEY_MODEL)}"
+                f"Creating Databricks provider with model {config.get(CONFIG_KEY_MODEL)}",
             )
             return DatabricksProvider(
                 model=config.get(CONFIG_KEY_MODEL),
@@ -100,11 +101,9 @@ class AIProvider(ABC):
                 ),
                 **kwargs,
             )
-        else:
-            if provider_type not in cls._providers:
-                raise ValueError(
-                    f"Unknown provider type: {provider_type}. Available types: {', '.join(cls._providers.keys())}"
-                )
-            # Generic initialization for future providers
-            provider_class = cls._providers[provider_type]
-            return provider_class(config)
+        if provider_type not in cls._providers:
+            error_msg = f"Unknown provider type: {provider_type}. Available types: {', '.join(cls._providers.keys())}"
+            raise ValueError(error_msg)
+        # Generic initialization for future providers
+        provider_class = cls._providers[provider_type]
+        return provider_class(config)

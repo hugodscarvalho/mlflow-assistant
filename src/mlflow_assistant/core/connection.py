@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 class MLflowConnection:
     """MLflow connection class to handle connections to MLflow Tracking Server.
+
     This class provides functionality to connect to both local and remote
     MLflow Tracking Servers.
     """

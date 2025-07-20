@@ -1,4 +1,6 @@
 """Constants for the MLflow Assistant providers."""
+from typing import ClassVar
+
 # Defaults Ollama
 FALLBACK_MODELS = ["llama2", "mistral", "gemma", "phi"]
 
@@ -18,12 +20,12 @@ class ParameterKeys:
     BASE_URL = "base_url"
 
     # Grouped by provider
-    PARAMETERS_OPENAI = [MAX_TOKENS, TIMEOUT, MAX_RETRIES, ORGANIZATION, BASE_URL]
-    PARAMETERS_OLLAMA = [MAX_TOKENS, TIMEOUT, MAX_RETRIES]
-    PARAMETERS_DATABRICKS = [MAX_TOKENS]
+    PARAMETERS_OPENAI: ClassVar[list[str]] = [MAX_TOKENS, TIMEOUT, MAX_RETRIES, ORGANIZATION, BASE_URL]
+    PARAMETERS_OLLAMA: ClassVar[list[str]] = [MAX_TOKENS, TIMEOUT, MAX_RETRIES]
+    PARAMETERS_DATABRICKS: ClassVar[list[str]] = [MAX_TOKENS]
 
     # All known parameters
-    PARAMETERS_ALL = [TEMPERATURE] + PARAMETERS_OPENAI
+    PARAMETERS_ALL: ClassVar[list[str]] = [TEMPERATURE, *PARAMETERS_OPENAI]
 
     @classmethod
     def get_parameters(cls, provider: str) -> list[str]:
