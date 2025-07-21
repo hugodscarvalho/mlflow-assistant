@@ -10,6 +10,7 @@ from typing import Any
 # Internal imports
 from mlflow_assistant.utils.config import load_config, get_mlflow_uri, get_provider_config
 from mlflow_assistant.utils.constants import Command, CONFIG_KEY_MLFLOW_URI, CONFIG_KEY_PROVIDER, CONFIG_KEY_TYPE, CONFIG_KEY_MODEL, DEFAULT_STATUS_NOT_CONFIGURED, LOG_FORMAT
+from mlflow_assistant.engine.processor import process_query
 from .setup import setup_wizard
 from .validation import validate_setup
 
@@ -60,8 +61,7 @@ def _process_user_query(query: str, provider_config: dict, verbose: bool) -> Non
 
     """
     try:
-        # This is a mock function call
-        result = mock_process_query(query, provider_config, verbose)
+        result = process_query(query, provider_config, verbose)
 
         # Display response
         click.echo(f"\n🤖 {result['response']}")
