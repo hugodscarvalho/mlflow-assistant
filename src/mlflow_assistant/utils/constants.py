@@ -13,6 +13,7 @@ CONFIG_KEY_TYPE = "type"
 CONFIG_KEY_MODEL = "model"
 CONFIG_KEY_URI = "uri"
 CONFIG_KEY_API_KEY = "api_key"
+CONFIG_KEY_PROFILE = "profile"
 
 # Environment variables
 MLFLOW_URI_ENV = "MLFLOW_TRACKING_URI"
@@ -21,6 +22,13 @@ OPENAI_API_KEY_ENV = "OPENAI_API_KEY"
 # Default values
 DEFAULT_MLFLOW_URI = "http://localhost:5000"
 DEFAULT_OLLAMA_URI = "http://localhost:11434"
+
+# Deafult Databricks Config file path
+DEFAULT_DATABRICKS_CONFIG_FILE = "~/.databrickscfg"
+ENVIRONMENT_VARIABLES = {
+    "DATABRICKS_HOST": "host",
+    "DATABRICKS_TOKEN": "token",
+}
 
 # Connection timeouts
 MLFLOW_CONNECTION_TIMEOUT = 5  # seconds

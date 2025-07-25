@@ -49,7 +49,6 @@ class DatabricksProvider(AIProvider):
 
         logger.info(f"Databricks provider initialized with model {self.model_name}")
 
-    @property
     def langchain_model(self):
         """Get the underlying LangChain model."""
         return self.model

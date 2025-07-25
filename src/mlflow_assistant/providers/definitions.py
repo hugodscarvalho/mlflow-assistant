@@ -4,6 +4,7 @@ from typing import ClassVar
 # Defaults Ollama
 FALLBACK_MODELS = ["llama2", "mistral", "gemma", "phi"]
 
+# Databricks cerdentials
 DATABRICKS_CREDENTIALS = ["DATABRICKS_TOKEN", "DATABRICKS_HOST"]
 
 

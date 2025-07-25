@@ -6,13 +6,14 @@ using natural language queries through various AI providers.
 import click
 import logging
 from typing import Any
+import asyncio
 
 # Internal imports
 from mlflow_assistant.utils.config import load_config, get_mlflow_uri, get_provider_config
 from mlflow_assistant.utils.constants import Command, CONFIG_KEY_MLFLOW_URI, CONFIG_KEY_PROVIDER, CONFIG_KEY_TYPE, CONFIG_KEY_MODEL, DEFAULT_STATUS_NOT_CONFIGURED, LOG_FORMAT
 from mlflow_assistant.engine.processor import process_query
-from .setup import setup_wizard
-from .validation import validate_setup
+from mlflow_assistant.cli.setup import setup_wizard
+from mlflow_assistant.cli.validation import validate_setup
 
 # Set up logging
 logger = logging.getLogger("mlflow_assistant.cli")
@@ -51,7 +52,7 @@ def _handle_special_commands(query: str) -> str | None:
     return None  # Process normally
 
 
-def _process_user_query(query: str, provider_config: dict, verbose: bool) -> None:
+async def _process_user_query(query: str, provider_config: dict, verbose: bool) -> None:
     """Process a user query and display the response.
 
     Args:
@@ -61,7 +62,7 @@ def _process_user_query(query: str, provider_config: dict, verbose: bool) -> Non
 
     """
     try:
-        result = process_query(query, provider_config, verbose)
+        result = await process_query(query, provider_config, verbose)
 
         # Display response
         click.echo(f"\n🤖 {result['response']}")
@@ -209,7 +210,7 @@ def start(verbose):
             continue
 
         # Process the query
-        _process_user_query(query, provider_config, verbose)
+        asyncio.run(_process_user_query(query, provider_config, verbose))
 
 
 @cli.command()

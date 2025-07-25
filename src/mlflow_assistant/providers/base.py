@@ -50,7 +50,7 @@ class AIProvider(ABC):
 
         # Extract common parameters
         kwargs = {}
-        for param in ParameterKeys.PARAMETERS_ALL.value:
+        for param in ParameterKeys.PARAMETERS_ALL:
             if param in config:
                 kwargs[param] = config[param]
 
@@ -96,7 +96,7 @@ class AIProvider(ABC):
             return DatabricksProvider(
                 model=config.get(CONFIG_KEY_MODEL),
                 temperature=config.get(
-                    ParameterKeys.TEMPERATURE.value,
+                    ParameterKeys.TEMPERATURE,
                     Provider.get_default_temperature(Provider.DATABRICKS),
                 ),
                 **kwargs,
