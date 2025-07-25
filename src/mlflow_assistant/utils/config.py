@@ -9,6 +9,7 @@ import yaml
 from pathlib import Path
 from typing import Any
 import logging
+import configparser
 
 from .constants import (
     CONFIG_KEY_MLFLOW_URI,
@@ -23,6 +24,9 @@ from .constants import (
     DEFAULT_OLLAMA_URI,
     CONFIG_DIRNAME,
     CONFIG_FILENAME,
+    CONFIG_KEY_PROFILE,
+    DEFAULT_DATABRICKS_CONFIG_FILE,
+    ENVIRONMENT_VARIABLES,
 )
 
 logger = logging.getLogger("mlflow_assistant.utils.config")
@@ -130,4 +134,34 @@ def get_provider_config() -> dict[str, Any]:
             ),
         }
 
+    if provider_type == Provider.DATABRICKS.value:
+        # Set environment variables for Databricks profile
+        _set_environment_variables(provider.get(CONFIG_KEY_PROFILE))
+
+        return {
+            CONFIG_KEY_TYPE: Provider.DATABRICKS.value,
+            CONFIG_KEY_PROFILE: provider.get(CONFIG_KEY_PROFILE),
+            CONFIG_KEY_MODEL: provider.get(CONFIG_KEY_MODEL),
+        }
+
     return {CONFIG_KEY_TYPE: None}
+
+
+def _set_environment_variables(profile: str) -> None:
+    """Set environment variables for the selected Databricks profile."""
+    config_path = Path(DEFAULT_DATABRICKS_CONFIG_FILE).expanduser()
+
+    # Get Databricks configuration file
+    config_string = Path(config_path).read_text()
+
+    # Get profiles from the Databricks configuration file
+    # Parse the config string
+    databricks_config = configparser.ConfigParser()
+    databricks_config.read_string(config_string)
+
+    # Get the selected profile configuration
+    profile_config = databricks_config[profile]
+
+    # Create environment variables for the selected profile
+    for key, env_var in ENVIRONMENT_VARIABLES.items():
+        os.environ[key] = profile_config[env_var]

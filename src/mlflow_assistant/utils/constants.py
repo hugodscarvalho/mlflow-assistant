@@ -13,6 +13,7 @@ CONFIG_KEY_TYPE = "type"
 CONFIG_KEY_MODEL = "model"
 CONFIG_KEY_URI = "uri"
 CONFIG_KEY_API_KEY = "api_key"
+CONFIG_KEY_PROFILE = "profile"
 
 # Environment variables
 MLFLOW_URI_ENV = "MLFLOW_TRACKING_URI"
@@ -21,6 +22,13 @@ OPENAI_API_KEY_ENV = "OPENAI_API_KEY"
 # Default values
 DEFAULT_MLFLOW_URI = "http://localhost:5000"
 DEFAULT_OLLAMA_URI = "http://localhost:11434"
+
+# Deafult Databricks Config file path
+DEFAULT_DATABRICKS_CONFIG_FILE = "~/.databrickscfg"
+ENVIRONMENT_VARIABLES = {
+    "DATABRICKS_HOST": "host",
+    "DATABRICKS_TOKEN": "token",
+}
 
 # Connection timeouts
 MLFLOW_CONNECTION_TIMEOUT = 5  # seconds
@@ -75,12 +83,25 @@ class OllamaModel(Enum):
         return [model.value for model in cls]
 
 
+# Default Databricks model names
+class DatabricksModel(Enum):
+    """Databricks models supported by MLflow Assistant."""
+
+    DATABRICKS_META_LLAMA3 = "databricks-meta-llama-3-3-70b-instruct"
+
+    @classmethod
+    def choices(cls):
+        """Get all available Databricks model choices."""
+        return [model.value for model in cls]
+
+
 # Provider types
 class Provider(Enum):
     """AI provider types supported by MLflow Assistant."""
 
     OPENAI = "openai"
     OLLAMA = "ollama"
+    DATABRICKS = "databricks"
 
     @classmethod
     def get_default_model(cls, provider):
@@ -88,6 +109,17 @@ class Provider(Enum):
         defaults = {
             cls.OPENAI: OpenAIModel.GPT35.value,
             cls.OLLAMA: OllamaModel.LLAMA32.value,
+            cls.DATABRICKS: DatabricksModel.DATABRICKS_META_LLAMA3.value,
+        }
+        return defaults.get(provider)
+
+    @classmethod
+    def get_default_temperature(cls, provider):
+        """Get the default temperature for a provider."""
+        defaults = {
+            cls.OPENAI: 0.7,
+            cls.DATABRICKS: 0.7,
+            cls.OLLAMA: 0.7,
         }
         return defaults.get(provider)
 
