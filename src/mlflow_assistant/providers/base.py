@@ -58,7 +58,7 @@ class AIProvider(ABC):
         if provider_type == Provider.OPENAI.value:
             from .openai_provider import OpenAIProvider
 
-            logger.info(
+            logger.debug(
                 f"Creating OpenAI provider with model {config.get(CONFIG_KEY_MODEL, Provider.get_default_model(Provider.OPENAI))}",
             )
             return OpenAIProvider(
@@ -75,7 +75,7 @@ class AIProvider(ABC):
         if provider_type == Provider.OLLAMA.value:
             from .ollama_provider import OllamaProvider
 
-            logger.info(
+            logger.debug(
                 f"Creating Ollama provider with model {config.get(CONFIG_KEY_MODEL)}",
             )
             return OllamaProvider(
@@ -90,7 +90,7 @@ class AIProvider(ABC):
         if provider_type == Provider.DATABRICKS.value:
             from .databricks_provider import DatabricksProvider
 
-            logger.info(
+            logger.debug(
                 f"Creating Databricks provider with model {config.get(CONFIG_KEY_MODEL)}",
             )
             return DatabricksProvider(

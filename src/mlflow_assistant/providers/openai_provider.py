@@ -46,7 +46,7 @@ class OpenAIProvider(AIProvider):
         # Initialize with parameters matching the documentation
         self.model = ChatOpenAI(**model_params)
 
-        logger.info(f"OpenAI provider initialized with model {self.model_name}")
+        logger.debug(f"OpenAI provider initialized with model {self.model_name}")
 
     def langchain_model(self):
         """Get the underlying LangChain model."""

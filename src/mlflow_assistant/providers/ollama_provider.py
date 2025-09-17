@@ -47,7 +47,7 @@ class OllamaProvider(AIProvider):
         # Use langchain-ollama's dedicated ChatOllama class
         self.model = ChatOllama(**model_params)
 
-        logger.info(
+        logger.debug(
             f"Ollama provider initialized with model {self.model_name} at {self.uri}",
         )
 

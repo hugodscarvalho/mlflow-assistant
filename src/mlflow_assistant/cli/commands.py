@@ -65,7 +65,7 @@ async def _process_user_query(query: str, provider_config: dict, verbose: bool) 
         result = await process_query(query, provider_config, verbose)
 
         # Display response
-        click.echo(f"\n🤖 {result['response']}")
+        click.echo(f"\n🤖 {result['response'].content}")
 
         # Show verbose info if requested
         if verbose:

@@ -63,12 +63,12 @@ class MLflowConnection:
 
         """
         try:
-            logger.info(f"Connecting to MLflow Tracking Server at {self.config.tracking_uri}")
+            logger.debug(f"Connecting to MLflow Tracking Server at {self.config.tracking_uri}")
             mlflow.set_tracking_uri(self.config.tracking_uri)
             self.client = self.client_factory(tracking_uri=self.config.tracking_uri)
             self.client.search_experiments()  # Trigger connection attempt
             self.is_connected_flag = True
-            logger.info(f"Successfully connected to MLflow Tracking Server at {self.config.tracking_uri}")
+            logger.debug(f"Successfully connected to MLflow Tracking Server at {self.config.tracking_uri}")
             return True, f"Successfully connected to MLflow Tracking Server at {self.config.tracking_uri}"
         except Exception as e:
             self.is_connected_flag = False

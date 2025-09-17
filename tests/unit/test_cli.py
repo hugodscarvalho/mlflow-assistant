@@ -86,11 +86,15 @@ class TestCliCommands:
                        "model": "test-model",
                        "api_key": "mock-key"}
 
+        class MockContentResponse:
+            def __init__(self, content):
+                self.content = content
+
         # Mock response that matches what the test expects
         def mock_process_query(query, provider_config, verbose=False):
             return {
                 "original_query": query,
-                "response": f"This is a mock response to: '{query}'",
+                "response": MockContentResponse(f"This is a mock response to: '{query}'"),
                 "duration": 0.1,
             }
 

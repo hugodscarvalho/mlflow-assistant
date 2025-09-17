@@ -47,7 +47,7 @@ class DatabricksProvider(AIProvider):
         # Initialize with parameters matching the documentation
         self.model = ChatDatabricks(**model_params)
 
-        logger.info(f"Databricks provider initialized with model {self.model_name}")
+        logger.debug(f"Databricks provider initialized with model {self.model_name}")
 
     def langchain_model(self):
         """Get the underlying LangChain model."""

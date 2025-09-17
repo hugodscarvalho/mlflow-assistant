@@ -43,14 +43,13 @@ def list_models(name_contains: str = "", max_results: int = MLFLOW_MAX_RESULTS) 
         A JSON string containing all registered models matching the criteria.
 
     """
-    logger.info(
+    logger.debug(
         f"Fetching registered models (filter: '{name_contains}', max: {max_results})",
     )
 
     try:
         # Get all registered models
         registered_models = client.search_registered_models(max_results=max_results)
-        logger.info(registered_models)
 
         # Filter by name if specified
         if name_contains:
@@ -120,7 +119,7 @@ def list_experiments(
         A JSON string containing all experiments matching the criteria.
 
     """
-    logger.info(f"Fetching experiments (filter: '{name_contains}', max: {max_results})")
+    logger.debug(f"Fetching experiments (filter: '{name_contains}', max: {max_results})")
 
     try:
         # Get all experiments
@@ -198,7 +197,7 @@ def get_model_details(model_name: str) -> str:
         A JSON string containing detailed information about the model.
 
     """
-    logger.info(f"Fetching details for model: {model_name}")
+    logger.debug(f"Fetching details for model: {model_name}")
 
     try:
         # Get the registered model
@@ -280,7 +279,7 @@ def get_system_info() -> str:
         A JSON string containing system information.
 
     """
-    logger.info("Getting MLflow system information")
+    logger.debug("Getting MLflow system information")
 
     try:
         info = {
