@@ -67,7 +67,7 @@ class AIProvider(ABC):
                     CONFIG_KEY_MODEL, Provider.get_default_model(Provider.OPENAI),
                 ),
                 temperature=config.get(
-                    ParameterKeys.TEMPERATURE.value,
+                    ParameterKeys.TEMPERATURE,
                     Provider.get_default_temperature(Provider.OPENAI),
                 ),
                 **kwargs,
@@ -82,7 +82,7 @@ class AIProvider(ABC):
                 uri=config.get(CONFIG_KEY_URI),
                 model=config.get(CONFIG_KEY_MODEL),
                 temperature=config.get(
-                    ParameterKeys.TEMPERATURE.value,
+                    ParameterKeys.TEMPERATURE,
                     Provider.get_default_temperature(Provider.OLLAMA),
                 ),
                 **kwargs,

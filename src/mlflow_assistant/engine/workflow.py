@@ -14,8 +14,8 @@ from mlflow_assistant.engine.definitions import (
     STATE_KEY_MESSAGES,
     STATE_KEY_PROVIDER_CONFIG,
 )
-from providers import AIProvider
-from tools import get_model_details, get_system_info, list_experiments, list_models
+from mlflow_assistant.providers import AIProvider
+from mlflow_assistant.engine.tools import get_model_details, get_system_info, list_experiments, list_models
 from typing_extensions import TypedDict
 
 # Configure logging to ensure output appears in console

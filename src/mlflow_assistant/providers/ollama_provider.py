@@ -51,7 +51,6 @@ class OllamaProvider(AIProvider):
             f"Ollama provider initialized with model {self.model_name} at {self.uri}",
         )
 
-    @property
     def langchain_model(self):
         """Get the underlying LangChain model."""
         return self.model

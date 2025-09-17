@@ -48,7 +48,6 @@ class OpenAIProvider(AIProvider):
 
         logger.info(f"OpenAI provider initialized with model {self.model_name}")
 
-    @property
     def langchain_model(self):
         """Get the underlying LangChain model."""
         return self.model

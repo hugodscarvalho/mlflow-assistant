@@ -17,7 +17,8 @@ dependencies = [
     "scipy (>=1.16.0,<2.0.0)",
     "langchain-core (>=0.3.72,<0.4.0)",
     "langgraph (==0.2.53)",
-    "databricks-langchain (>=0.6.0,<0.7.0)"
+    "databricks-langchain (>=0.6.0,<0.7.0)",
+    "langchain-openai (>=0.3.30,<0.4.0)"
 ]
 
 [project.optional-dependencies]
