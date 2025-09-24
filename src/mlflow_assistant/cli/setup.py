@@ -7,10 +7,12 @@ AI provider configuration (OpenAI or Ollama).
 import os
 import click
 import logging
+import configparser
 
 from mlflow_assistant.utils.config import load_config, save_config
+from pathlib import Path
 from .validation import validate_mlflow_uri, validate_ollama_connection
-from mlflow_assistant.utils.constants import Provider, OpenAIModel, CONFIG_KEY_MLFLOW_URI, CONFIG_KEY_PROVIDER, CONFIG_KEY_TYPE, CONFIG_KEY_MODEL, CONFIG_KEY_URI, DEFAULT_MLFLOW_URI, DEFAULT_OLLAMA_URI, OPENAI_API_KEY_ENV
+from mlflow_assistant.utils.constants import Provider, OpenAIModel, CONFIG_KEY_MLFLOW_URI, CONFIG_KEY_PROVIDER, CONFIG_KEY_TYPE, CONFIG_KEY_MODEL, CONFIG_KEY_URI, DEFAULT_MLFLOW_URI, DEFAULT_OLLAMA_URI, OPENAI_API_KEY_ENV, DEFAULT_DATABRICKS_CONFIG_FILE, CONFIG_KEY_PROFILE
 
 logger = logging.getLogger("mlflow_assistant.setup")
 
@@ -222,6 +224,59 @@ def setup_wizard():
                 ),
             )
             provider_config[CONFIG_KEY_MODEL] = ollama_model
+
+    elif current_provider_type == Provider.DATABRICKS.value:
+        config_path = Path(DEFAULT_DATABRICKS_CONFIG_FILE).expanduser()
+        # Verify Databricks configuration file path
+        click.echo(f"Checking Databricks configuration file at: {config_path}")
+        if not os.path.isfile(config_path):
+            # File does not exist, prompt user to create it
+            click.echo(
+                    "Setup aborted. Please setup Databricks config file and try again.",
+                )
+            return
+
+        # Get Databricks configuration file
+        config_string = Path(config_path).read_text()
+
+        # Get profiles from the Databricks configuration file
+        # Parse the config string
+        databricks_config = configparser.ConfigParser()
+        databricks_config.read_string(config_string)
+
+        # Manually include DEFAULT section
+        all_sections = ['DEFAULT', *databricks_config.sections()]
+
+        profile_options = [section for section in all_sections if 'token' in databricks_config[section]]
+
+        if not profile_options:
+            click.echo(
+                "\n⚠️  No valid profiles found in Databricks configuration file.",
+            )
+            click.echo(
+                "Please ensure your Databricks config file contains a profile with a 'token'.",
+            )
+            click.echo(
+                "Setup aborted. Please fix the configuration and try again.",
+            )
+            return
+
+        profile = click.prompt(
+            "\nWhich databricks profile would you like to use?",
+            type=click.Choice(profile_options, case_sensitive=False),
+            default=profile_options[0],
+        )
+
+        # Peompt for model name
+        databricks_model = click.prompt(
+            "Enter the Databricks model to use",
+        )
+
+        provider_config = {
+            CONFIG_KEY_TYPE: Provider.DATABRICKS.value,
+            CONFIG_KEY_PROFILE: profile,
+            CONFIG_KEY_MODEL: databricks_model,
+        }
 
     config[CONFIG_KEY_PROVIDER] = provider_config
 

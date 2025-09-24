@@ -1,7 +1,6 @@
 """Constants and definitions for the MLflow Assistant."""
 from dataclasses import dataclass
 
-
 # Environment variable names for MLflow connection
 MLFLOW_TRACKING_URI_ENV = "MLFLOW_TRACKING_URI"
 

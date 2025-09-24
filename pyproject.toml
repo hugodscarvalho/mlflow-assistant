@@ -1,19 +1,25 @@
 [project]
 name = "mlflow-assistant"
-version = "0.1.4"
+version = "0.1.5"
 description = "An MLflow plugin that enables natural language conversations with your MLflow server using LLM providers like OpenAI and Ollama."
 authors = [
     {name = "Hugo Carvalho",email = "hugodanielsilvacarvalho.hc@gmail.com"}
 ]
 license = {text = "Apache License 2.0"}
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.12.4,<4.0"
 dependencies = [
     "mlflow>=2.21.0,<3.0.0",
     "click>=8.0.0",
     "requests>=2.25.0",
     "pyyaml>=6.0",
-    "python-dotenv"
+    "python-dotenv",
+    "scipy (>=1.16.0,<2.0.0)",
+    "langchain-core (>=0.3.72,<0.4.0)",
+    "langgraph (==0.2.53)",
+    "databricks-langchain (>=0.6.0,<0.7.0)",
+    "langchain-openai (>=0.3.30,<0.4.0)",
+    "langchain-ollama (==0.3.8)"
 ]
 
 [project.optional-dependencies]
@@ -61,6 +67,7 @@ ignore = [
   "D213",  # Ignore multi-line-summary-second-line
   "BLE001", # Ignore blind-except
   "SIM117", # Ignore nested with statements
+  "C901", # Ignore complexity
 ]
 select = [
     "D",    # Pydocstyle

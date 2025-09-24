@@ -175,6 +175,7 @@ cython_debug/
 
 # MLflow tracking
 mlruns/
+mlartifacts/
 
 # .DS_Store
 .DS_Store

@@ -86,6 +86,18 @@ class TestCliCommands:
                        "model": "test-model",
                        "api_key": "mock-key"}
 
+        class MockContentResponse:
+            def __init__(self, content):
+                self.content = content
+
+        # Mock response that matches what the test expects
+        def mock_process_query(query, provider_config, verbose=False):
+            return {
+                "original_query": query,
+                "response": MockContentResponse(f"This is a mock response to: '{query}'"),
+                "duration": 0.1,
+            }
+
         with patch(
             "mlflow_assistant.cli.commands.validate_setup",
             return_value=(True, ""),
@@ -95,6 +107,9 @@ class TestCliCommands:
         ), patch(
             "mlflow_assistant.cli.commands.get_mlflow_uri",
             return_value="http://test:5000",
+        ), patch(
+            "mlflow_assistant.cli.commands.process_query",
+            side_effect=mock_process_query,
         ):
             # Simulate user entering a question and then /bye
             result = runner.invoke(
